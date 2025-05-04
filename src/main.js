@@ -2,9 +2,9 @@
 let users = [
   {
     id: 1,
-    username: 'admin',
-    email: 'admin@hotel.com',
-    password: 'admin123',
+    username: 'manager',
+    email: 'manager@yourhotel.com',
+    password: 'managerpass',
     phone: '123-456-7890',
     age: 35,
     role: 'manager'
@@ -12,16 +12,16 @@ let users = [
   {
     id: 2,
     username: 'receptionist',
-    email: 'reception@hotel.com',
-    password: 'reception123',
+    email: 'receptionist@yourhotel.com',
+    password: 'receptionpass',
     phone: '123-456-7891',
     age: 28,
     role: 'receptionist'
   },
   {
     id: 3,
-    username: 'john',
-    email: 'john@example.com',
+    username: 'guest',
+    email: 'guest@yourhotel.com',
     password: 'password123',
     phone: '123-456-7892',
     age: 32,
@@ -204,7 +204,7 @@ function renderHeaderFooter(content) {
   return `
     <header class="header">
       <div class="container header-container">
-        <h1 class="logo">Serene Hotel</h1>
+        <h1 class="logo">Your Hotel</h1>
         <nav>
           <ul class="nav-menu">
             <li class="nav-item"><a href="#" class="nav-link" onclick="event.preventDefault(); navigateTo('/')">Home</a></li>
@@ -223,7 +223,7 @@ function renderHeaderFooter(content) {
     <main>${content}</main>
     <footer class="footer">
       <div class="container">
-        <p>&copy; ${new Date().getFullYear()} Serene Hotel. All rights reserved.</p>
+        <p>&copy; ${new Date().getFullYear()} Your Hotel. All rights reserved.</p>
       </div>
     </footer>
   `;
@@ -233,7 +233,7 @@ function renderHomePage() {
   const content = `
     <section class="hero">
       <div class="hero-content">
-        <h1>Welcome to Serene Hotel</h1>
+        <h1>Welcome to Your Hotel</h1>
         <p>Experience luxury and comfort like never before</p>
         <button class="btn btn-secondary" onclick="navigateTo('/rooms')">Explore Rooms</button>
       </div>
