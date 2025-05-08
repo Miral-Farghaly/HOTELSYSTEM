@@ -12,7 +12,7 @@ bool ApiClient::login(const std::string& email, const std::string& password, con
     json payload = {
         {"email", email},
         {"password", password}
-        // {"role", role} // Add only if backend requires it
+         {"role", role} // Add only if backend requires it
     };
     std::cout << "[API Request] POST /login" << std::endl;
 

@@ -8,8 +8,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_TOOLCHAIN_FILE "<path/to/your/vcpkg>/scripts/buildsystems/vcpkg.cmake"
     CACHE STRING "Vcpkg toolchain file") # *** UPDATE THIS PATH ***
 
+# --- Find Packages ---
 find_package(cpr CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
+find_package(dotenv-cpp CONFIG REQUIRED) # <--- ADD THIS
 
 # --- Add Executable with ALL source files ---
 add_executable(hotel_client
@@ -22,4 +24,8 @@ add_executable(hotel_client
 )
 
 # --- Link Libraries ---
-target_link_libraries(hotel_client PRIVATE cpr::cpr nlohmann_json::nlohmann_json)
+target_link_libraries(hotel_client PRIVATE
+    cpr::cpr
+    nlohmann_json::nlohmann_json
+    dotenv-cpp::dotenv-cpp       # <--- ADD THIS
+)

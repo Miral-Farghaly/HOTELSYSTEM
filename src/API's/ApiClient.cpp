@@ -31,8 +31,7 @@ cpr::Header ApiClient::prepareHeaders(bool requiresAuth) {
             headers["Authorization"] = "Bearer " + auth_token_;
         } else {
             std::cerr << "[Header Warning] Auth required but client is not authenticated." << std::endl;
-            // Consider throwing an exception here if this is an unrecoverable state for the caller
-            // throw std::runtime_error("Authentication required but not available.");
+            throw std::runtime_error("Authentication required but not available.");
         }
     }
     return headers;

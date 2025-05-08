@@ -5,13 +5,12 @@
 #include <string>
 #include <vector>
 #include <optional>
-#include <nlohmann/json.hpp> // Include json header
-#include "DataStructures.h"  // Include our structs
+#include <nlohmann/json.hpp>
+#include "DataStructures.h"
 
-// Forward declare cpr::Response and cpr::Header
 namespace cpr {
     class Response;
-    class Header; // Forward declare Header as well
+    class Header;
 }
 using json = nlohmann::json;
 
@@ -20,18 +19,21 @@ class ApiClient {
 private:
     std::string base_url_;
     std::string auth_token_;
-
-    // --- Private Helpers ---
+// --- Rooms ---
+std::vector<Room> getRooms();                  // GET /rooms
+std::optional<Room> getRoomById(int id);       // GET /rooms/{id}
+// *** UPDATED DECLARATIONS ***
+std::optional<Room> createRoom(const RoomData& roomData); // POST /rooms (Requires Auth)
+bool updateRoom(int id, const RoomData& roomData);      // PUT /rooms/{id} (Requires Auth)
+bool deleteRoom(int id);    
     cpr::Header prepareHeaders(bool requiresAuth = false);
     std::optional<json> handleResponse(const cpr::Response& response, int expectedStatus = 200);
-
-    // Central method to perform HTTP requests
     std::optional<json> performRequest(
-        const std::string& method,           // e.g., "GET", "POST"
-        const std::string& relative_path,    // e.g., "/login", "/rooms/5"
-        int expectedStatus,                 // Expected HTTP status for success
-        bool requiresAuth,                  // Does this request need the auth token?
-        const std::optional<json>& payload = std::nullopt // Optional JSON body for POST/PUT
+        const std::string& method,
+        const std::string& relative_path,
+        int expectedStatus,
+        bool requiresAuth,
+        const std::optional<json>& payload = std::nullopt
     );
 
 public:
@@ -39,25 +41,29 @@ public:
 
     bool isAuthenticated() const;
 
-    // --- Authentication (Declarations only) ---
+    // --- Authentication ---
     bool login(const std::string& email, const std::string& password, const std::string& role = "user");
     bool signup(const std::string& username, const std::string& email, const std::string& password, const std::string& phone, int age);
     bool logout();
 
-    // --- Rooms (Declarations only) ---
-    std::vector<Room> getRooms();
-    std::optional<Room> getRoomById(int id);
-    // Add declarations for POST, PUT, DELETE rooms if needed
+    // --- Rooms ---
+    std::vector<Room> getRooms();                  // GET /rooms
+    std::optional<Room> getRoomById(int id);       // GET /rooms/{id}
+    // *** ADDED DECLARATIONS ***
+    std::optional<Room> createRoom(const Room& roomData); // POST /rooms (Requires Auth) - Note: Pass relevant data
+    bool updateRoom(int id, const Room& roomData); // PUT /rooms/{id} (Requires Auth) - Note: Pass relevant data
+    bool deleteRoom(int id);                       // DELETE /rooms/{id} (Requires Auth)
+    // *************************
 
-    // --- Bookings (Declarations only) ---
+    // --- Bookings ---
     std::optional<Booking> createBooking(const BookingData& bookingData);
     std::vector<Booking> getBookings();
     std::optional<Booking> getBookingById(int id);
     bool deleteBooking(int id);
 
-    // --- User Profile (Declarations only) ---
+    // --- User Profile ---
     std::optional<User> getUserProfile(int id);
-    bool updateUserProfile(int id, const User& userData); // Note: Pass necessary fields, not necessarily whole User struct
+    bool updateUserProfile(int id, const User& userData);
 
 };
 
