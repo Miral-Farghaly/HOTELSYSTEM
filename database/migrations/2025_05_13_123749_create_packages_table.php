@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('packages', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        $table->id('package_id');
+        $table->string('name');
+        $table->text('description')->nullable();
+        $table->date('valid_from');
+        $table->date('valid_to');
+        $table->timestamps();
         });
     }
 
