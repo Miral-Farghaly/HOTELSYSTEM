@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('rooms', function (Blueprint $table) {
     $table->id('room_id');
-    $table->unsignedBigInteger('branch_id');
     $table->unsignedBigInteger('room_type_id');
     $table->string('room_number');
     $table->enum('status', ['available', 'out_of_service']);
