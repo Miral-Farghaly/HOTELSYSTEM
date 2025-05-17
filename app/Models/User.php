@@ -40,6 +40,23 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
     ];
+
+
+
+        public function isAdmin()
+    {
+        return $this->role === 'manager';
+    }
+
+    public function isReceptionist()
+    {
+        return $this->role === 'receptionist';
+    }
+
+    public function isGuest()
+    {
+        return $this->role === 'guest';
+    }
+
 }

@@ -13,10 +13,9 @@ return new class extends Migration
     {
         Schema::create('room_types', function (Blueprint $table) {
         $table->id('room_type_id');
-        $table->string('name'); // Suite, Single, etc.
+        $table->string('type'); // room type like suite , master
         $table->string('bed_size');
         $table->string('view_type');
-        $table->decimal('base_rate', 8, 2);
         $table->text('description')->nullable();
         $table->timestamps();
 
