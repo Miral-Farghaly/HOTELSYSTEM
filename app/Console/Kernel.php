@@ -12,7 +12,24 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // Backup tasks
+        $schedule->command('backup:clean')->daily()->at('00:00');
+        $schedule->command('backup:run')->daily()->at('01:00');
+        $schedule->command('backup:monitor')->daily()->at('02:00');
+        $schedule->command('backup:clean')->weekly()->at('00:30');
+
+        // Cache tasks
+        $schedule->command('cache:warmup')->hourly();
+        $schedule->command('cache:prune-stale')->daily();
+        
+        // Clear and rebuild specific caches during off-peak hours
+        $schedule->command('cache:clear --tag=hotel_prices')->daily()->at('03:00')
+            ->then(function () {
+                \Artisan::call('cache:warmup');
+            });
+            
+        // Monitor cache size and health
+        $schedule->command('cache:monitor')->hourly();
     }
 
     /**
