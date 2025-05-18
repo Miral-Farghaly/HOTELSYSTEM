@@ -14,29 +14,33 @@ use App\Http\Controllers\UserController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Serve React app for all non-API routes
+Route::get('/{path?}', function () {
+    return view('app');
+})->where('path', '^(?!api).*$');
 
+// API Routes
+Route::prefix('api')->group(function () {
+    Route::post('/login', [UserController::class, 'login']);
+    Route::post('/register', [UserController::class, 'register']);
 
+    // Protected API Routes
+    Route::middleware(['auth:sanctum'])->group(function () {
+        // Admin Routes
+        Route::prefix('admin')->middleware(['role:super-admin|manager'])->group(function () {
+            Route::get('/dashboard', [App\Http\Controllers\Admin\AdminController::class, 'dashboard']);
+            Route::get('/users', [App\Http\Controllers\Admin\AdminController::class, 'users']);
+            Route::get('/rooms', [App\Http\Controllers\Admin\AdminController::class, 'rooms']);
+            Route::get('/reservations', [App\Http\Controllers\Admin\AdminController::class, 'reservations']);
+            Route::get('/reports', [App\Http\Controllers\Admin\AdminController::class, 'reports']);
+        });
 
-
-Route::post('/login',[UserController::class, 'login']);
-Route::post('/register',[UserController::class, 'register']);
-
-// Admin Routes
-Route::prefix('admin')->middleware(['auth', 'role:super-admin|manager'])->group(function () {
-    Route::get('/dashboard', [App\Http\Controllers\Admin\AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::get('/users', [App\Http\Controllers\Admin\AdminController::class, 'users'])->name('admin.users');
-    Route::get('/rooms', [App\Http\Controllers\Admin\AdminController::class, 'rooms'])->name('admin.rooms');
-    Route::get('/reservations', [App\Http\Controllers\Admin\AdminController::class, 'reservations'])->name('admin.reservations');
-    Route::get('/reports', [App\Http\Controllers\Admin\AdminController::class, 'reports'])->name('admin.reports');
-});
-
-// Staff Routes
-Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function () {
-    Route::get('/dashboard', [App\Http\Controllers\Staff\StaffController::class, 'dashboard'])->name('staff.dashboard');
-    Route::get('/reservations', [App\Http\Controllers\Staff\StaffController::class, 'reservations'])->name('staff.reservations');
+        // Staff Routes
+        Route::prefix('staff')->middleware(['role:staff'])->group(function () {
+            Route::get('/dashboard', [App\Http\Controllers\Staff\StaffController::class, 'dashboard']);
+            Route::get('/reservations', [App\Http\Controllers\Staff\StaffController::class, 'reservations']);
+        });
+    });
 });
 
 
