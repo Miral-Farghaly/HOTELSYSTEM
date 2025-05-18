@@ -3,12 +3,14 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Throwable;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Illuminate\Database\QueryException;
+use Throwable;
+use Illuminate\Support\Facades\Log;
 
 class Handler extends ExceptionHandler
 {
@@ -23,80 +25,86 @@ class Handler extends ExceptionHandler
         'password_confirmation',
     ];
 
-    protected $dontReport = [
-        ValidationException::class,
-    ];
-
     /**
      * Register the exception handling callbacks for the application.
      */
     public function register(): void
     {
         $this->reportable(function (Throwable $e) {
-            $this->logException($e);
-        });
-
-        // Custom handling for specific exceptions
-        $this->renderable(function (NotFoundHttpException $e, $request) {
-            if ($request->is('api/*')) {
-                return response()->json([
-                    'message' => 'Resource not found',
-                    'error_code' => 'NOT_FOUND'
-                ], 404);
+            if (app()->bound('sentry')) {
+                app('sentry')->captureException($e);
             }
         });
 
-        $this->renderable(function (AuthenticationException $e, $request) {
+        // Handle API exceptions
+        $this->renderable(function (Throwable $e, $request) {
             if ($request->is('api/*')) {
-                return response()->json([
-                    'message' => 'Unauthenticated',
-                    'error_code' => 'UNAUTHENTICATED'
-                ], 401);
+                return $this->handleApiException($e, $request);
             }
         });
     }
 
-    protected function logException(Throwable $exception): void
+    /**
+     * Handle API exceptions and return JSON responses
+     */
+    private function handleApiException(Throwable $e, $request): \Illuminate\Http\JsonResponse
     {
-        $context = [
-            'exception' => get_class($exception),
-            'file' => $exception->getFile(),
-            'line' => $exception->getLine(),
-            'trace' => $exception->getTraceAsString(),
-            'previous' => $exception->getPrevious() ? get_class($exception->getPrevious()) : null,
-            'url' => request()->fullUrl(),
-            'method' => request()->method(),
-            'ip' => request()->ip(),
-            'user_id' => auth()->id(),
+        $error = [
+            'message' => 'Server Error',
+            'status_code' => 500,
         ];
 
-        // Add request data safely
-        if (request()->all()) {
-            $input = request()->except(['password', 'password_confirmation', 'credit_card']);
-            $context['request_data'] = json_encode($input);
+        // Add debug information in non-production environments
+        if (!app()->environment('production')) {
+            $error['debug'] = [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ];
         }
 
-        // Log to different channels based on exception type
-        if ($exception instanceof ValidationException) {
-            Log::channel('error')->info('Validation error', $context);
-        } elseif ($exception instanceof AuthenticationException) {
-            Log::channel('security')->warning('Authentication failure', $context);
-        } elseif ($exception instanceof \Stripe\Exception\CardException) {
-            Log::channel('payment')->error('Payment processing error', $context);
-        } else {
-            Log::channel('error')->error('Application error', $context);
-            
-            // Send critical errors to Slack
-            if ($this->isCriticalException($exception)) {
-                Log::channel('slack')->critical('Critical error occurred', $context);
-            }
+        if ($e instanceof AuthenticationException) {
+            $error['message'] = 'Unauthenticated';
+            $error['status_code'] = 401;
+        } elseif ($e instanceof ValidationException) {
+            $error['message'] = 'Validation Error';
+            $error['errors'] = $e->errors();
+            $error['status_code'] = 422;
+        } elseif ($e instanceof ModelNotFoundException) {
+            $error['message'] = 'Resource not found';
+            $error['status_code'] = 404;
+        } elseif ($e instanceof NotFoundHttpException) {
+            $error['message'] = 'Endpoint not found';
+            $error['status_code'] = 404;
+        } elseif ($e instanceof MethodNotAllowedHttpException) {
+            $error['message'] = 'Method not allowed';
+            $error['status_code'] = 405;
+        } elseif ($e instanceof QueryException) {
+            $error['message'] = 'Database error';
+            $error['status_code'] = 500;
+            // Log the actual error but don't expose it
+            \Log::error('Database error: ' . $e->getMessage());
         }
-    }
 
-    protected function isCriticalException(Throwable $exception): bool
-    {
-        return $exception instanceof \PDOException
-            || $exception instanceof \ErrorException
-            || $exception->getCode() >= 500;
+        // Log server errors
+        if ($error['status_code'] >= 500) {
+            \Log::error('Server Error', [
+                'exception' => get_class($e),
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => $request->user()?->id,
+                'url' => $request->fullUrl(),
+                'method' => $request->method(),
+                'ip' => $request->ip(),
+            ]);
+        }
+
+        return response()->json([
+            'error' => $error['message'],
+            'status_code' => $error['status_code'],
+            'errors' => $error['errors'] ?? null,
+            'debug' => $error['debug'] ?? null,
+        ], $error['status_code']);
     }
 }

@@ -1,0 +1,26 @@
+parameters:
+    level: 8
+    paths:
+        - app
+        - config
+        - database
+        - routes
+        - tests
+    excludePaths:
+        - vendor
+        - storage
+        - bootstrap/cache
+    checkMissingIterableValueType: false
+    checkGenericClassInNonGenericObjectType: false
+    ignoreErrors:
+        - '#PHPDoc tag @var#'
+        - '#Call to an undefined method Illuminate\\Support\\Facades\\[a-zA-Z]+::[a-zA-Z]+\(\)#'
+        - '#Access to an undefined property [a-zA-Z\\]+::\$[a-zA-Z_]+#'
+    tmpDir: storage/framework/cache/phpstan
+    parallel:
+        maximumNumberOfProcesses: 4
+    dynamicConstantNames:
+        - APP_ENV
+        - APP_DEBUG
+    treatPhpDocTypesAsCertain: false
+    reportUnmatchedIgnoredErrors: false 

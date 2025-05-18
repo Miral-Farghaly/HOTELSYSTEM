@@ -8,6 +8,9 @@ use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\RoomController;
 use App\Http\Controllers\Api\V1\Admin\AdminController;
 use App\Http\Controllers\Api\V1\Admin\MonitoringController;
+use App\Http\Controllers\Api\V1\ReservationController;
+use App\Http\Controllers\Api\V1\Admin\ReportController;
+use App\Http\Controllers\Api\V1\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,7 +19,7 @@ use App\Http\Controllers\Api\V1\Admin\MonitoringController;
 */
 
 // Public routes
-Route::prefix('v1')->group(function () {
+Route::prefix('v1')->name('api.')->group(function () {
     // Auth routes
     Route::post('auth/register', [AuthController::class, 'register']);
     Route::post('auth/login', [AuthController::class, 'login']);
@@ -25,6 +28,9 @@ Route::prefix('v1')->group(function () {
     
     // Room routes (public)
     Route::get('rooms/available', [RoomController::class, 'available']);
+    Route::get('rooms/check-availability', [RoomController::class, 'checkAvailability']);
+    Route::get('rooms', [RoomController::class, 'index']);
+    Route::get('rooms/{room}', [RoomController::class, 'show']);
     
     // Payment webhook
     Route::post('payments/webhook', [PaymentController::class, 'handleWebhook']);
@@ -65,5 +71,50 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
             Route::get('logs', [MonitoringController::class, 'logs']);
             Route::get('errors', [MonitoringController::class, 'errorStats']);
         });
+
+        // Reports
+        Route::get('reports/occupancy', [ReportController::class, 'occupancy']);
+        Route::get('reports/revenue', [ReportController::class, 'revenue']);
+        Route::get('reports/maintenance', [ReportController::class, 'maintenance']);
     });
+
+    // Rooms management (requires permission)
+    Route::middleware('permission:manage-rooms')->group(function () {
+        Route::post('rooms', [RoomController::class, 'store']);
+        Route::put('rooms/{room}', [RoomController::class, 'update']);
+        Route::delete('rooms/{room}', [RoomController::class, 'destroy']);
+        Route::put('rooms/{room}/maintenance', [RoomController::class, 'maintenance']);
+    });
+
+    // Room reservations
+    Route::get('rooms/{room}/reservations', [RoomController::class, 'reservations'])
+        ->name('rooms.reservations');
+    Route::get('rooms/{room}/maintenance-logs', [RoomController::class, 'maintenanceLogs'])
+        ->name('rooms.maintenance-logs');
+
+    // Reservations
+    Route::apiResource('reservations', ReservationController::class);
+    Route::post('reservations/{reservation}/check-in', [ReservationController::class, 'checkIn']);
+    Route::post('reservations/{reservation}/check-out', [ReservationController::class, 'checkOut']);
+    Route::post('reservations/{reservation}/cancel', [ReservationController::class, 'cancel']);
+
+    // User profile
+    Route::get('profile', [ProfileController::class, 'show']);
+    Route::put('profile', [ProfileController::class, 'update']);
+    Route::put('profile/password', [ProfileController::class, 'updatePassword']);
+
+    // Maintenance Categories
+    Route::apiResource('maintenance/categories', 'App\Http\Controllers\Api\V1\MaintenanceCategoryController');
+
+    // Maintenance Tasks
+    Route::apiResource('maintenance/tasks', 'App\Http\Controllers\Api\V1\MaintenanceTaskController');
+    Route::post('maintenance/tasks/{task}/complete', 'App\Http\Controllers\Api\V1\MaintenanceTaskController@complete');
+
+    // Maintenance Inventory
+    Route::apiResource('maintenance/inventory', 'App\Http\Controllers\Api\V1\MaintenanceInventoryController');
+    Route::post('maintenance/inventory/{item}/adjust', 'App\Http\Controllers\Api\V1\MaintenanceInventoryController@adjust');
+
+    // Staff Skills
+    Route::apiResource('staff/skills', 'App\Http\Controllers\Api\V1\StaffSkillController');
+    Route::post('staff/skills/{skill}/verify', 'App\Http\Controllers\Api\V1\StaffSkillController@verify');
 }); 

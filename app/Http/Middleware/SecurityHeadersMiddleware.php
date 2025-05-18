@@ -22,17 +22,9 @@ class SecurityHeadersMiddleware
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
         }
 
-        // Content Security Policy
-        $response->headers->set('Content-Security-Policy', "
-            default-src 'self';
-            script-src 'self' 'unsafe-inline' 'unsafe-eval';
-            style-src 'self' 'unsafe-inline';
-            img-src 'self' data: https:;
-            font-src 'self' data:;
-            connect-src 'self' ".env('FRONTEND_URL', 'http://localhost:3000').";
-            frame-ancestors 'self';
-            form-action 'self';
-        ");
+        // Content Security Policy - all in one line
+        $csp = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' " . env('FRONTEND_URL', 'http://localhost:3000') . "; frame-ancestors 'self'; form-action 'self'";
+        $response->headers->set('Content-Security-Policy', $csp);
 
         return $response;
     }

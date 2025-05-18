@@ -12,13 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('room_types', function (Blueprint $table) {
-        $table->id('room_type_id');
-        $table->string('type'); // room type like suite , master
-        $table->string('bed_size');
-        $table->string('view_type');
-        $table->text('description')->nullable();
-        $table->timestamps();
-
+            $table->id('room_type_id');
+            $table->string('name');
+            $table->text('description');
+            $table->decimal('base_price', 10, 2);
+            $table->integer('capacity');
+            $table->json('amenities');
+            $table->string('bed_size');
+            $table->string('view_type');
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 
