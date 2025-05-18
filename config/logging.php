@@ -109,20 +109,16 @@ return [
             'with' => [
                 'stream' => 'php://stderr',
             ],
-            'processors' => [PsrLogMessageProcessor::class],
         ],
 
         'syslog' => [
             'driver' => 'syslog',
             'level' => env('LOG_LEVEL', 'debug'),
-            'facility' => LOG_USER,
-            'replace_placeholders' => true,
         ],
 
         'errorlog' => [
             'driver' => 'errorlog',
             'level' => env('LOG_LEVEL', 'debug'),
-            'replace_placeholders' => true,
         ],
 
         'null' => [
@@ -131,7 +127,7 @@ return [
         ],
 
         'emergency' => [
-            'path' => storage_path('logs/emergency.log'),
+            'path' => storage_path('logs/laravel.log'),
         ],
     ],
 
