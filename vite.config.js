@@ -9,7 +9,10 @@ export default defineConfig({
       input: ['resources/src/main.jsx'],
       refresh: true,
     }),
-    react(),
+    react({
+      jsxRuntime: 'automatic',
+      fastRefresh: true,
+    }),
   ],
   server: {
     hmr: {
@@ -17,12 +20,6 @@ export default defineConfig({
     },
     host: 'localhost',
     port: 8888,
-  },
-  esbuild: {
-    loader: {
-      '.js': 'jsx', // if you still have .js files using JSX
-    },
-    include: /resources\/src\/.*\.js$/, // limit JSX loader to your src folder
   },
   resolve: {
     alias: {

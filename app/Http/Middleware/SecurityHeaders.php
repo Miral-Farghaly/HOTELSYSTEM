@@ -12,13 +12,13 @@ class SecurityHeaders
         $response = $next($request);
 
         $response->headers->set('Content-Security-Policy', 
-            "default-src 'self' localhost:8888; " .
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' localhost:8888; " .
-            "style-src 'self' 'unsafe-inline' fonts.googleapis.com localhost:8888; " .
+            "default-src 'self' localhost:8889; " .
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' localhost:8889; " .
+            "style-src 'self' 'unsafe-inline' fonts.googleapis.com localhost:8889; " .
             "font-src 'self' fonts.gstatic.com data:; " .
             "img-src 'self' data: https: blob:; " .
-            "connect-src 'self' localhost:8888 ws://localhost:8888 wss://localhost:8888; " .
-            "frame-src 'self' localhost:8888;"
+            "connect-src 'self' localhost:8889 ws://localhost:8889 wss://localhost:8889; " .
+            "frame-src 'self' localhost:8889;"
         );
 
         return $response;
