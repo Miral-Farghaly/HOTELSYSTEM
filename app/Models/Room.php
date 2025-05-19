@@ -32,41 +32,24 @@ class Room extends Model
 
     protected $fillable = [
         'number',
-        'type_id',
+        'type',
         'floor',
-        'status',
-        'is_maintenance',
         'description',
         'price_per_night',
-        'capacity',
-        'amenities',
         'base_price',
         'currency',
-        'is_blocked',
-        'block_reason',
-        'block_until',
-        'allow_waitlist',
-        'max_overbooking',
+        'capacity',
+        'is_available',
+        'needs_maintenance',
+        'amenities'
     ];
 
     protected $casts = [
-        'is_maintenance' => 'boolean',
-        'amenities' => 'array',
+        'is_available' => 'boolean',
+        'needs_maintenance' => 'boolean',
         'price_per_night' => 'decimal:2',
         'base_price' => 'decimal:2',
-        'is_blocked' => 'boolean',
-        'block_until' => 'datetime',
-        'allow_waitlist' => 'boolean',
-        'max_overbooking' => 'integer',
-    ];
-
-    protected $attributes = [
-        'status' => 'active',
-        'is_maintenance' => false,
-        'currency' => 'USD',
-        'is_blocked' => false,
-        'allow_waitlist' => true,
-        'max_overbooking' => 0,
+        'amenities' => 'array'
     ];
 
     public function type(): BelongsTo
@@ -222,5 +205,10 @@ class Room extends Model
             ->count();
 
         return $currentOverbookings < $this->max_overbooking;
+    }
+
+    public function bookings(): HasMany
+    {
+        return $this->hasMany(Booking::class);
     }
 } 

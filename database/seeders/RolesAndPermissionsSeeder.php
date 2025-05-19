@@ -5,49 +5,45 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\PermissionRegistrar;
 
 class RolesAndPermissionsSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
         // Reset cached roles and permissions
-        app()[PermissionRegistrar::class]->forgetCachedPermissions();
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Create permissions
         $permissions = [
-            // User management
+            // Room permissions
+            'view rooms',
+            'create rooms',
+            'edit rooms',
+            'delete rooms',
+            'manage room maintenance',
+            
+            // Booking permissions
+            'view bookings',
+            'create bookings',
+            'edit bookings',
+            'cancel bookings',
+            'manage booking payments',
+            
+            // User permissions
             'view users',
             'create users',
             'edit users',
             'delete users',
             
-            // Room management
-            'view rooms',
-            'create rooms',
-            'edit rooms',
-            'delete rooms',
-            
-            // Reservation management
-            'view reservations',
-            'create reservations',
-            'edit reservations',
-            'delete reservations',
-            'approve reservations',
-            
-            // Payment management
-            'view payments',
-            'process payments',
-            'refund payments',
-            
-            // Report management
+            // Report permissions
             'view reports',
             'generate reports',
+            'export reports',
             
-            // Feedback management
-            'view feedback',
-            'respond feedback',
-            'delete feedback',
+            // Settings permissions
+            'manage settings',
+            'manage roles',
+            'view logs',
         ];
 
         foreach ($permissions as $permission) {
@@ -55,44 +51,51 @@ class RolesAndPermissionsSeeder extends Seeder
         }
 
         // Create roles and assign permissions
-        
-        // Super Admin
-        $superAdminRole = Role::create(['name' => 'super-admin']);
-        $superAdminRole->givePermissionTo(Permission::all());
+        Role::create(['name' => 'guest'])
+            ->givePermissionTo(['view rooms']);
 
-        // Hotel Manager
-        $managerRole = Role::create(['name' => 'manager']);
-        $managerRole->givePermissionTo([
-            'view users',
-            'view rooms',
-            'edit rooms',
-            'view reservations',
-            'approve reservations',
-            'view payments',
-            'view reports',
-            'generate reports',
-            'view feedback',
-            'respond feedback',
-        ]);
+        Role::create(['name' => 'customer'])
+            ->givePermissionTo([
+                'view rooms',
+                'create bookings',
+                'view bookings',
+                'cancel bookings',
+            ]);
 
-        // Staff
-        $staffRole = Role::create(['name' => 'staff']);
-        $staffRole->givePermissionTo([
-            'view rooms',
-            'view reservations',
-            'create reservations',
-            'edit reservations',
-            'view payments',
-            'process payments',
-            'view feedback',
-        ]);
+        Role::create(['name' => 'staff'])
+            ->givePermissionTo([
+                'view rooms',
+                'edit rooms',
+                'view bookings',
+                'edit bookings',
+                'cancel bookings',
+                'manage booking payments',
+                'view users',
+                'view reports',
+            ]);
 
-        // Guest
-        $guestRole = Role::create(['name' => 'guest']);
-        $guestRole->givePermissionTo([
-            'view rooms',
-            'create reservations',
-            'view reservations',
-        ]);
+        Role::create(['name' => 'manager'])
+            ->givePermissionTo([
+                'view rooms',
+                'create rooms',
+                'edit rooms',
+                'delete rooms',
+                'manage room maintenance',
+                'view bookings',
+                'create bookings',
+                'edit bookings',
+                'cancel bookings',
+                'manage booking payments',
+                'view users',
+                'create users',
+                'edit users',
+                'view reports',
+                'generate reports',
+                'export reports',
+                'manage settings',
+            ]);
+
+        Role::create(['name' => 'admin'])
+            ->givePermissionTo(Permission::all());
     }
 } 

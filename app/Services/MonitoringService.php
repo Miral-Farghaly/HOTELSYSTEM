@@ -8,6 +8,7 @@ use App\Models\MaintenanceLog;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Models\Booking;
 
 class MonitoringService
 {
@@ -59,74 +60,154 @@ class MonitoringService
         ];
     }
 
-    public function getRoomMetrics(): array
-    {
-        return Cache::remember('room_metrics', 3600, function () {
-            return [
-                'total_rooms' => Room::count(),
-                'available_rooms' => Room::available()->count(),
-                'maintenance_rooms' => Room::where('is_maintenance', true)->count(),
-                'occupancy_rate' => $this->calculateOccupancyRate(),
-                'maintenance_stats' => $this->getMaintenanceStats(),
-            ];
-        });
-    }
-
-    public function getReservationMetrics(): array
-    {
-        return Cache::remember('reservation_metrics', 3600, function () {
-            return [
-                'total_reservations' => Reservation::count(),
-                'active_reservations' => $this->getActiveReservations(),
-                'upcoming_reservations' => $this->getUpcomingReservations(),
-                'revenue_stats' => $this->getRevenueStats(),
-            ];
-        });
-    }
-
-    public function getSystemHealth(): array
+    public function getSystemMetrics(): array
     {
         return [
-            'queue_size' => $this->getQueueSize(),
-            'failed_jobs' => $this->getFailedJobsCount(),
-            'disk_usage' => $this->getDiskUsage(),
-            'cache_hit_rate' => $this->getCacheHitRate(),
-            'average_response_time' => $this->getAverageResponseTime(),
+            'bookings' => $this->getBookingMetrics(),
+            'rooms' => $this->getRoomMetrics(),
+            'system' => $this->getSystemHealthMetrics(),
+            'performance' => $this->getPerformanceMetrics()
         ];
     }
 
-    protected function checkDatabaseConnection(): bool
+    private function getRoomMetrics(): array
+    {
+        return Cache::remember('monitoring.rooms', 300, function () {
+            return [
+                'total' => Room::count(),
+                'available' => Room::where('is_available', true)->count(),
+                'maintenance' => Room::where('needs_maintenance', true)->count(),
+                'occupancy_rate' => $this->calculateOccupancyRate(),
+                'average_price' => Room::avg('price_per_night'),
+                'maintenance_stats' => $this->getMaintenanceStats()
+            ];
+        });
+    }
+
+    private function getBookingMetrics(): array
+    {
+        return Cache::remember('monitoring.bookings', 300, function () {
+            return [
+                'total' => Booking::count(),
+                'pending' => Booking::where('status', 'pending')->count(),
+                'confirmed' => Booking::where('status', 'confirmed')->count(),
+                'cancelled' => Booking::where('status', 'cancelled')->count(),
+                'revenue_today' => Booking::whereDate('created_at', today())
+                    ->where('status', 'confirmed')
+                    ->sum('total_price'),
+                'bookings_today' => Booking::whereDate('created_at', today())->count(),
+                'active_reservations' => $this->getActiveReservations(),
+                'upcoming_reservations' => $this->getUpcomingReservations(),
+                'revenue_stats' => $this->getRevenueStats()
+            ];
+        });
+    }
+
+    private function getSystemHealthMetrics(): array
+    {
+        return [
+            'database' => $this->checkDatabaseConnection(),
+            'cache' => $this->checkCacheConnection(),
+            'storage' => $this->checkStorageHealth(),
+            'queue' => $this->checkQueueHealth(),
+            'disk_usage' => $this->getDiskUsage()
+        ];
+    }
+
+    private function getPerformanceMetrics(): array
+    {
+        return [
+            'average_response_time' => $this->getAverageResponseTime(),
+            'error_rate' => $this->getErrorRate(),
+            'memory_usage' => memory_get_usage(true),
+            'cpu_usage' => sys_getloadavg()[0],
+            'cache_hit_rate' => $this->getCacheHitRate()
+        ];
+    }
+
+    private function calculateOccupancyRate(): float
+    {
+        $totalRooms = Room::count();
+        if ($totalRooms === 0) {
+            return 0;
+        }
+
+        $occupiedRooms = Booking::where('status', 'confirmed')
+            ->whereDate('check_in_date', '<=', now())
+            ->whereDate('check_out_date', '>=', now())
+            ->count();
+
+        return ($occupiedRooms / $totalRooms) * 100;
+    }
+
+    private function checkDatabaseConnection(): bool
     {
         try {
             DB::connection()->getPdo();
             return true;
         } catch (\Exception $e) {
-            Log::channel('error')->error('Database connection failed', [
-                'error' => $e->getMessage()
-            ]);
+            Log::error('Database connection failed: ' . $e->getMessage());
             return false;
         }
     }
 
-    protected function checkCacheConnection(): bool
+    private function checkCacheConnection(): bool
     {
         try {
-            Cache::store()->get('test_key');
+            Cache::store()->get('test');
             return true;
         } catch (\Exception $e) {
-            Log::channel('error')->error('Cache connection failed', [
-                'error' => $e->getMessage()
-            ]);
+            Log::error('Cache connection failed: ' . $e->getMessage());
             return false;
         }
     }
 
-    protected function checkStorageAccess(): bool
+    private function checkStorageHealth(): array
+    {
+        $storagePath = storage_path();
+        return [
+            'free_space' => disk_free_space($storagePath),
+            'total_space' => disk_total_space($storagePath),
+            'is_writable' => is_writable($storagePath)
+        ];
+    }
+
+    private function checkQueueHealth(): array
+    {
+        return [
+            'failed_jobs' => DB::table('failed_jobs')->count(),
+            'pending_jobs' => DB::table('jobs')->count()
+        ];
+    }
+
+    private function getAverageResponseTime(): float
+    {
+        return Cache::remember('monitoring.avg_response_time', 60, function () {
+            return DB::table('request_logs')
+                ->whereDate('created_at', today())
+                ->avg('response_time') ?? 0.0;
+        });
+    }
+
+    private function getErrorRate(): float
+    {
+        return Cache::remember('monitoring.error_rate', 60, function () {
+            $totalRequests = Cache::get('monitoring.total_requests', 0);
+            if ($totalRequests === 0) {
+                return 0;
+            }
+
+            $errorCount = Cache::get('monitoring.error_count', 0);
+            return ($errorCount / $totalRequests) * 100;
+        });
+    }
+
+    private function checkStorageAccess(): bool
     {
         return is_writable(storage_path()) && is_writable(storage_path('logs'));
     }
 
-    protected function checkQueueConnection(): bool
+    private function checkQueueConnection(): bool
     {
         try {
             $connection = config('queue.default');
@@ -136,7 +217,7 @@ class MonitoringService
         }
     }
 
-    protected function getMemoryUsage(): array
+    private function getMemoryUsage(): array
     {
         return [
             'current' => memory_get_usage(true),
@@ -144,12 +225,12 @@ class MonitoringService
         ];
     }
 
-    protected function getActiveUsers(): int
+    private function getActiveUsers(): int
     {
         return Cache::get('active_users', 0);
     }
 
-    protected function getDatabaseMetrics(): array
+    private function getDatabaseMetrics(): array
     {
         return [
             'total_connections' => DB::select('SHOW STATUS LIKE "Threads_connected"')[0]->Value ?? 0,
@@ -157,53 +238,12 @@ class MonitoringService
         ];
     }
 
-    protected function getCacheHitRatio(): float
+    private function getCacheHitRatio(): float
     {
         $hits = Cache::get('cache_hits', 0);
         $misses = Cache::get('cache_misses', 0);
         
         return $hits + $misses > 0 ? ($hits / ($hits + $misses)) * 100 : 0;
-    }
-
-    protected function getAverageResponseTime(): float
-    {
-        return Cache::remember('avg_response_time', 300, function () {
-            return DB::table('request_logs')
-                ->whereDate('created_at', today())
-                ->avg('response_time') ?? 0;
-        });
-    }
-
-    protected function getErrorRate(): float
-    {
-        $total = Cache::get('total_requests', 0);
-        $errors = Cache::get('error_requests', 0);
-        
-        return $total > 0 ? ($errors / $total) * 100 : 0;
-    }
-
-    private function calculateOccupancyRate(): float
-    {
-        $totalRooms = Room::count();
-        if ($totalRooms === 0) return 0;
-
-        $occupiedRooms = Reservation::whereDate('check_in', '<=', now())
-            ->whereDate('check_out', '>=', now())
-            ->count();
-
-        return round(($occupiedRooms / $totalRooms) * 100, 2);
-    }
-
-    private function getMaintenanceStats(): array
-    {
-        return [
-            'scheduled' => MaintenanceLog::where('status', 'scheduled')->count(),
-            'in_progress' => MaintenanceLog::where('status', 'in_progress')->count(),
-            'completed' => MaintenanceLog::where('status', 'completed')
-                ->whereMonth('completed_at', now()->month)
-                ->count(),
-            'average_completion_time' => $this->getAverageMaintenanceTime(),
-        ];
     }
 
     private function getActiveReservations(): int
@@ -240,16 +280,6 @@ class MonitoringService
             ->sum('total_amount');
     }
 
-    private function getQueueSize(): int
-    {
-        return DB::table('jobs')->count();
-    }
-
-    private function getFailedJobsCount(): int
-    {
-        return DB::table('failed_jobs')->count();
-    }
-
     private function getDiskUsage(): array
     {
         $storage = storage_path();
@@ -274,11 +304,23 @@ class MonitoringService
         return $total > 0 ? round(($hits / $total) * 100, 2) : 0;
     }
 
+    private function getMaintenanceStats(): array
+    {
+        return [
+            'scheduled' => MaintenanceLog::where('status', 'scheduled')->count(),
+            'in_progress' => MaintenanceLog::where('status', 'in_progress')->count(),
+            'completed' => MaintenanceLog::whereMonth('completed_at', now()->month)
+                ->where('status', 'completed')
+                ->count(),
+            'average_completion_time' => $this->getAverageMaintenanceTime()
+        ];
+    }
+
     private function getAverageMaintenanceTime(): float
     {
         return MaintenanceLog::where('status', 'completed')
-            ->whereNotNull('end_date')
+            ->whereNotNull('completed_at')
             ->whereMonth('completed_at', now()->month)
-            ->avg(DB::raw('TIMESTAMPDIFF(HOUR, start_date, end_date)')) ?? 0;
+            ->avg(DB::raw('TIMESTAMPDIFF(HOUR, created_at, completed_at)')) ?? 0;
     }
 } 

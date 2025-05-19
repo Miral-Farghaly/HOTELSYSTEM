@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -48,27 +47,32 @@ class User extends Authenticatable
     ];
 
     // Relationships
-    public function reservations()
+    public function reservations(): HasMany
     {
         return $this->hasMany(Reservation::class);
     }
 
-    public function feedbacks()
+    public function feedbacks(): HasMany
     {
         return $this->hasMany(Feedback::class);
     }
 
-    public function isAdmin()
+    public function bookings(): HasMany
+    {
+        return $this->hasMany(Booking::class);
+    }
+
+    public function isAdmin(): bool
     {
         return $this->role === 'manager';
     }
 
-    public function isReceptionist()
+    public function isReceptionist(): bool
     {
         return $this->role === 'receptionist';
     }
 
-    public function isGuest()
+    public function isGuest(): bool
     {
         return $this->role === 'guest';
     }

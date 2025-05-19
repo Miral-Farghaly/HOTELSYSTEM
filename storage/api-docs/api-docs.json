@@ -19,46 +19,567 @@
         }
     ],
     "paths": {
-        "/api/v1/rooms": {
+        "/api/v1/maintenance/categories": {
             "get": {
                 "tags": [
-                    "Rooms"
+                    "Maintenance Categories"
                 ],
-                "summary": "Get list of rooms",
-                "description": "Returns list of rooms with optional filters",
-                "operationId": "getRoomsList",
+                "summary": "List all maintenance categories",
+                "operationId": "c119844a8de55d4bf5f0f099ec03ffbc",
+                "responses": {
+                    "200": {
+                        "description": "List of maintenance categories",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/MaintenanceCategory"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Maintenance Categories"
+                ],
+                "summary": "Create a new maintenance category",
+                "operationId": "036706cc9e3c16146265f602b1882a56",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MaintenanceCategory"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Category created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MaintenanceCategory"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/maintenance/categories/{category}": {
+            "get": {
+                "tags": [
+                    "Maintenance Categories"
+                ],
+                "summary": "Get category details",
+                "operationId": "77a48ab2fc6a90e8e4ccfcc9d710f643",
                 "parameters": [
                     {
-                        "name": "type",
-                        "in": "query",
-                        "description": "Room type filter",
-                        "required": false,
+                        "name": "category",
+                        "in": "path",
+                        "required": true,
                         "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "min_price",
-                        "in": "query",
-                        "description": "Minimum price filter",
-                        "required": false,
-                        "schema": {
-                            "type": "number"
-                        }
-                    },
-                    {
-                        "name": "max_price",
-                        "in": "query",
-                        "description": "Maximum price filter",
-                        "required": false,
-                        "schema": {
-                            "type": "number"
+                            "type": "integer"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful operation",
+                        "description": "Category details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MaintenanceCategory"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Maintenance Categories"
+                ],
+                "summary": "Update category details",
+                "operationId": "2e594fe9f079939748f0ca3791f64601",
+                "parameters": [
+                    {
+                        "name": "category",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MaintenanceCategory"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Category updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MaintenanceCategory"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Maintenance Categories"
+                ],
+                "summary": "Delete a category",
+                "operationId": "98d04e2ac0bc14081ce27fa77242e981",
+                "parameters": [
+                    {
+                        "name": "category",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Category deleted successfully"
+                    }
+                }
+            }
+        },
+        "/api/v1/maintenance/inventory": {
+            "get": {
+                "tags": [
+                    "Maintenance Inventory"
+                ],
+                "summary": "List all inventory items",
+                "operationId": "0d9f3ddb3076892bfe1252bd2fb86e58",
+                "responses": {
+                    "200": {
+                        "description": "List of inventory items",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/MaintenanceInventory"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Maintenance Inventory"
+                ],
+                "summary": "Create a new inventory item",
+                "operationId": "283d55cf4b3e03dd99d1e00365b88b1e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MaintenanceInventory"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Item created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MaintenanceInventory"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/maintenance/inventory/{item}": {
+            "get": {
+                "tags": [
+                    "Maintenance Inventory"
+                ],
+                "summary": "Get inventory item details",
+                "operationId": "33fec0e289d5c1104a4c3908b7d4d56a",
+                "parameters": [
+                    {
+                        "name": "item",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Inventory item details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MaintenanceInventory"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Maintenance Inventory"
+                ],
+                "summary": "Update inventory item details",
+                "operationId": "ba42015a782d66a68370502f85cee603",
+                "parameters": [
+                    {
+                        "name": "item",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MaintenanceInventory"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Item updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MaintenanceInventory"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Maintenance Inventory"
+                ],
+                "summary": "Delete an inventory item",
+                "operationId": "19ba284d6e790b9cb6d51440609a2152",
+                "parameters": [
+                    {
+                        "name": "item",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Item deleted successfully"
+                    }
+                }
+            }
+        },
+        "/api/v1/maintenance/inventory/{item}/adjust": {
+            "post": {
+                "tags": [
+                    "Maintenance Inventory"
+                ],
+                "summary": "Adjust inventory item quantity",
+                "operationId": "221c4547d7589ffa5a7ae723cc7d1a30",
+                "parameters": [
+                    {
+                        "name": "item",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "quantity": {
+                                        "type": "number"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "in",
+                                            "out"
+                                        ]
+                                    },
+                                    "reason": {
+                                        "type": "string"
+                                    },
+                                    "task_id": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Quantity adjusted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MaintenanceInventory"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/maintenance/tasks": {
+            "get": {
+                "tags": [
+                    "Maintenance Tasks"
+                ],
+                "summary": "List all maintenance tasks",
+                "operationId": "065b300bb4d973cbe667d3463940692e",
+                "responses": {
+                    "200": {
+                        "description": "List of maintenance tasks",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/MaintenanceTask"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Maintenance Tasks"
+                ],
+                "summary": "Create a new maintenance task",
+                "operationId": "c98d7f6bff566d72dcc5ad095480aa1f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MaintenanceTask"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Task created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MaintenanceTask"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/maintenance/tasks/{task}": {
+            "get": {
+                "tags": [
+                    "Maintenance Tasks"
+                ],
+                "summary": "Get task details",
+                "operationId": "ea402d9b87befc2493ec924005994225",
+                "parameters": [
+                    {
+                        "name": "task",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Task details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MaintenanceTask"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Maintenance Tasks"
+                ],
+                "summary": "Update task details",
+                "operationId": "112f4ed4a77b6dea346af1e16225ad20",
+                "parameters": [
+                    {
+                        "name": "task",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MaintenanceTask"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Task updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MaintenanceTask"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Maintenance Tasks"
+                ],
+                "summary": "Delete a task",
+                "operationId": "99adaff1be818d59432af37b16fc75bc",
+                "parameters": [
+                    {
+                        "name": "task",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Task deleted successfully"
+                    }
+                }
+            }
+        },
+        "/api/v1/maintenance/tasks/{task}/complete": {
+            "post": {
+                "tags": [
+                    "Maintenance Tasks"
+                ],
+                "summary": "Complete a maintenance task",
+                "operationId": "7916565968ab9d938b174ecd9d3ba294",
+                "parameters": [
+                    {
+                        "name": "task",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Task completed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MaintenanceTask"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/rooms": {
+            "get": {
+                "tags": [
+                    "Rooms"
+                ],
+                "summary": "List all rooms",
+                "operationId": "31a8839ec4012ed828bcc67b19738698",
+                "parameters": [
+                    {
+                        "name": "type_id",
+                        "in": "query",
+                        "description": "Filter by room type ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by room status",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "active",
+                                "inactive",
+                                "maintenance"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of rooms",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -71,21 +592,52 @@
                         }
                     }
                 }
+            },
+            "post": {
+                "tags": [
+                    "Rooms"
+                ],
+                "summary": "Create a new room",
+                "operationId": "b660449fe16228d1c90a5b92f5716e7e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RoomRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Room created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Room"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
             }
         },
-        "/api/v1/rooms/{id}": {
+        "/api/v1/rooms/{room}": {
             "get": {
                 "tags": [
                     "Rooms"
                 ],
-                "summary": "Get room information",
-                "description": "Returns room data",
-                "operationId": "getRoomById",
+                "summary": "Get room details",
+                "operationId": "3aa744ef2227fff59fd43e569e482291",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "room",
                         "in": "path",
-                        "description": "Room id",
+                        "description": "Room ID",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -94,7 +646,156 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful operation",
+                        "description": "Room details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Room"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Room not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Rooms"
+                ],
+                "summary": "Update room details",
+                "operationId": "acc6edfbb08d0db8497885d41db83ba2",
+                "parameters": [
+                    {
+                        "name": "room",
+                        "in": "path",
+                        "description": "Room ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RoomRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Room updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Room"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Room not found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Rooms"
+                ],
+                "summary": "Delete a room",
+                "operationId": "b410c55e2530df7a80341586e59b100b",
+                "parameters": [
+                    {
+                        "name": "room",
+                        "in": "path",
+                        "description": "Room ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Room deleted successfully"
+                    },
+                    "404": {
+                        "description": "Room not found"
+                    }
+                }
+            }
+        },
+        "/api/v1/rooms/check-availability": {
+            "get": {
+                "tags": [
+                    "Rooms"
+                ],
+                "summary": "Check room availability",
+                "operationId": "3e18bc691ddf5fdc581f9268f2948dac",
+                "parameters": [
+                    {
+                        "name": "check_in",
+                        "in": "query",
+                        "description": "Check-in date (Y-m-d)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "check_out",
+                        "in": "query",
+                        "description": "Check-out date (Y-m-d)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "room_type_id",
+                        "in": "query",
+                        "description": "Room type ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Room availability status"
+                    }
+                }
+            }
+        },
+        "/api/v1/rooms/{room}/maintenance": {
+            "put": {
+                "tags": [
+                    "Rooms"
+                ],
+                "summary": "Toggle room maintenance status",
+                "operationId": "dbef09f2ddc8a84f8ca4d7b39f056e9a",
+                "parameters": [
+                    {
+                        "name": "room",
+                        "in": "path",
+                        "description": "Room ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Room maintenance status updated",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -109,64 +810,194 @@
                 }
             }
         },
-        "/api/v1/rooms/{id}/availability": {
+        "/api/v1/staff/skills": {
             "get": {
                 "tags": [
-                    "Rooms"
+                    "Staff Skills"
                 ],
-                "summary": "Check room availability",
-                "description": "Returns room availability for given dates",
-                "operationId": "checkRoomAvailability",
+                "summary": "List all staff skills",
+                "operationId": "9685fc408989f058482fe49752b4b68a",
+                "responses": {
+                    "200": {
+                        "description": "List of staff skills",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/StaffSkill"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Staff Skills"
+                ],
+                "summary": "Add a new staff skill",
+                "operationId": "24ee41cf526bba9e0faf1b65dd0075c1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StaffSkill"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Skill added successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StaffSkill"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/staff/skills/{skill}": {
+            "get": {
+                "tags": [
+                    "Staff Skills"
+                ],
+                "summary": "Get staff skill details",
+                "operationId": "00d1be840fcb4e938003d66fba060078",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "skill",
                         "in": "path",
-                        "description": "Room id",
                         "required": true,
                         "schema": {
                             "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "check_in",
-                        "in": "query",
-                        "description": "Check-in date",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "date"
-                        }
-                    },
-                    {
-                        "name": "check_out",
-                        "in": "query",
-                        "description": "Check-out date",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "date"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful operation",
+                        "description": "Staff skill details",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "available": {
-                                            "type": "boolean"
-                                        },
-                                        "blocked_dates": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "string",
-                                                "format": "date"
-                                            }
-                                        }
+                                    "$ref": "#/components/schemas/StaffSkill"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Staff Skills"
+                ],
+                "summary": "Update staff skill details",
+                "operationId": "210490f2e3cdbd74ec2433ea4c84e3b4",
+                "parameters": [
+                    {
+                        "name": "skill",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StaffSkill"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Skill updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StaffSkill"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Staff Skills"
+                ],
+                "summary": "Delete a staff skill",
+                "operationId": "f193678daea8226a4cf8014a124453cb",
+                "parameters": [
+                    {
+                        "name": "skill",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Skill deleted successfully"
+                    }
+                }
+            }
+        },
+        "/api/v1/staff/skills/{skill}/verify": {
+            "post": {
+                "tags": [
+                    "Staff Skills"
+                ],
+                "summary": "Verify a staff skill",
+                "operationId": "42db43d96fc4eaa8a764fd971893c421",
+                "parameters": [
+                    {
+                        "name": "skill",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "notes": {
+                                        "type": "string"
                                     },
-                                    "type": "object"
+                                    "next_verification_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Skill verified successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StaffSkill"
                                 }
                             }
                         }
@@ -177,39 +1008,35 @@
     },
     "components": {
         "schemas": {
-            "Room": {
+            "RoomRequest": {
                 "required": [
-                    "name",
-                    "type",
-                    "price",
-                    "capacity"
+                    "number",
+                    "room_type_id",
+                    "floor"
                 ],
                 "properties": {
-                    "id": {
+                    "number": {
+                        "type": "string",
+                        "maxLength": 10
+                    },
+                    "room_type_id": {
                         "type": "integer",
-                        "format": "int64",
-                        "example": 1
+                        "format": "int64"
                     },
-                    "name": {
-                        "type": "string",
-                        "example": "Deluxe Ocean View"
+                    "floor": {
+                        "type": "integer"
                     },
-                    "type": {
+                    "status": {
                         "type": "string",
-                        "example": "deluxe"
+                        "enum": [
+                            "active",
+                            "inactive",
+                            "maintenance"
+                        ]
                     },
                     "description": {
                         "type": "string",
-                        "example": "Spacious room with ocean view"
-                    },
-                    "price": {
-                        "type": "number",
-                        "format": "float",
-                        "example": 299.99
-                    },
-                    "capacity": {
-                        "type": "integer",
-                        "example": 2
+                        "nullable": true
                     },
                     "amenities": {
                         "type": "array",
@@ -217,17 +1044,665 @@
                             "type": "string"
                         }
                     },
-                    "image_url": {
+                    "is_maintenance": {
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "MaintenanceCategory": {
+                "required": [
+                    "name",
+                    "description"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "readOnly": true
+                    },
+                    "name": {
                         "type": "string",
-                        "format": "url"
+                        "maxLength": 255
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "estimated_duration": {
+                        "description": "Estimated duration in minutes",
+                        "type": "integer"
+                    },
+                    "required_skills": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "required_items": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "priority_level": {
+                        "type": "integer",
+                        "maximum": 5,
+                        "minimum": 1
+                    },
+                    "is_recurring": {
+                        "type": "boolean"
+                    },
+                    "recurrence_pattern": {
+                        "type": "string",
+                        "nullable": true
                     },
                     "created_at": {
                         "type": "string",
-                        "format": "datetime"
+                        "format": "date-time",
+                        "readOnly": true
                     },
                     "updated_at": {
                         "type": "string",
-                        "format": "datetime"
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "deleted_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "MaintenanceInventory": {
+                "required": [
+                    "name",
+                    "sku",
+                    "quantity",
+                    "unit"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "sku": {
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "quantity": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "unit": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "min_quantity": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "reorder_point": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "category": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "location": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "supplier_info": {
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "last_ordered_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "deleted_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "MaintenanceInventoryLog": {
+                "required": [
+                    "inventory_id",
+                    "quantity_change",
+                    "previous_quantity",
+                    "new_quantity"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "readOnly": true
+                    },
+                    "inventory_id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "task_id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "quantity_change": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "previous_quantity": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "new_quantity": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "reason": {
+                        "type": "string"
+                    },
+                    "performed_by": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "type": "object"
+            },
+            "MaintenanceTask": {
+                "required": [
+                    "room_id",
+                    "category_id",
+                    "scheduled_date",
+                    "status"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "readOnly": true
+                    },
+                    "room_id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "category_id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "assigned_to": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "scheduled_date": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "completed_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "in_progress",
+                            "completed",
+                            "cancelled"
+                        ]
+                    },
+                    "notes": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "actual_duration": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "items_used": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "deleted_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "Room": {
+                "required": [
+                    "number",
+                    "room_type_id",
+                    "floor",
+                    "status"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "readOnly": true
+                    },
+                    "number": {
+                        "type": "string",
+                        "maxLength": 10
+                    },
+                    "room_type_id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "floor": {
+                        "type": "integer"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "active",
+                            "inactive",
+                            "maintenance"
+                        ]
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "amenities": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "is_maintenance": {
+                        "type": "boolean"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "deleted_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "RoomBlock": {
+                "required": [
+                    "room_id",
+                    "reason",
+                    "blocked_by"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "readOnly": true
+                    },
+                    "room_id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "reason": {
+                        "type": "string"
+                    },
+                    "start_date": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "end_date": {
+                        "type": "string",
+                        "format": "date",
+                        "nullable": true
+                    },
+                    "notes": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "priority": {
+                        "type": "integer"
+                    },
+                    "blocked_by": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "type": "object"
+            },
+            "RoomPriceHistory": {
+                "required": [
+                    "room_id",
+                    "old_price",
+                    "new_price"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "readOnly": true
+                    },
+                    "room_id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "old_price": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "new_price": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "reason": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "changed_by": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "type": "object"
+            },
+            "RoomSpecialPrice": {
+                "required": [
+                    "room_id",
+                    "price",
+                    "start_date",
+                    "end_date"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "readOnly": true
+                    },
+                    "room_id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "price": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "start_date": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "end_date": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "event_name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "created_by": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "type": "object"
+            },
+            "RoomType": {
+                "required": [
+                    "name",
+                    "description",
+                    "base_price"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "base_price": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "capacity": {
+                        "type": "integer"
+                    },
+                    "amenities": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "deleted_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "RoomWaitlist": {
+                "required": [
+                    "room_id",
+                    "user_id",
+                    "check_in",
+                    "check_out"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "readOnly": true
+                    },
+                    "room_id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "check_in": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "check_out": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "notes": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "waiting",
+                            "notified",
+                            "expired",
+                            "converted"
+                        ]
+                    },
+                    "last_notified_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "type": "object"
+            },
+            "StaffSkill": {
+                "required": [
+                    "user_id",
+                    "skill_name",
+                    "level"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "readOnly": true
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "skill_name": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "level": {
+                        "type": "string",
+                        "enum": [
+                            "beginner",
+                            "intermediate",
+                            "advanced",
+                            "expert"
+                        ]
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "certifications": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true
+                    },
+                    "acquired_date": {
+                        "type": "string",
+                        "format": "date",
+                        "nullable": true
+                    },
+                    "expiry_date": {
+                        "type": "string",
+                        "format": "date",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
                     }
                 },
                 "type": "object"
@@ -236,15 +1711,36 @@
         "securitySchemes": {
             "bearerAuth": {
                 "type": "http",
-                "bearerFormat": "JWT",
-                "scheme": "bearer"
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
             }
         }
     },
     "tags": [
         {
+            "name": "Maintenance Categories",
+            "description": "API Endpoints for maintenance category management"
+        },
+        {
+            "name": "Maintenance Inventory",
+            "description": "API Endpoints for maintenance inventory management"
+        },
+        {
+            "name": "Maintenance Tasks",
+            "description": "API Endpoints for maintenance task management"
+        },
+        {
             "name": "Rooms",
-            "description": "Rooms"
+            "description": "API Endpoints for room management"
+        },
+        {
+            "name": "Staff Skills",
+            "description": "API Endpoints for staff skills management"
+        }
+    ],
+    "security": [
+        {
+            "bearerAuth": []
         }
     ]
 }

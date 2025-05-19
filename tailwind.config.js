@@ -3,8 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = {
     darkMode: ["class"],
     content: [
-        "./resources/**/*.blade.php",
-        "./resources/src/**/*.{js,ts,jsx,tsx}",
+        "./pages/**/*.{ts,tsx}",
+        "./components/**/*.{ts,tsx}",
+        "./app/**/*.{ts,tsx}",
+        "./src/**/*.{ts,tsx}",
     ],
     prefix: "",
     theme: {
@@ -90,5 +92,5 @@ exports.default = {
             }
         }
     },
-    plugins: [],
+    plugins: [require("tailwindcss-animate")],
 };

@@ -1,34 +1,18 @@
 User-agent: *
 Allow: /
 Allow: /rooms
-Allow: /booking
-Allow: /special-offers
-Allow: /contact
 Allow: /about
-Allow: /facilities
-Allow: /gallery
+Allow: /contact
 Allow: /blog
-Allow: /sitemap.xml
 
-# Disallow admin and sensitive areas
 Disallow: /admin/
 Disallow: /api/
 Disallow: /login
 Disallow: /register
 Disallow: /password/
-Disallow: /email/
-Disallow: /dashboard/
-Disallow: /*.json$
-Disallow: /*.xml$
-Disallow: /*?*sort=
-Disallow: /*?*filter=
-Disallow: /*?*page=
-Disallow: /*?*query=
+Disallow: /bookings/
+Disallow: /profile/
 
-# Crawl-delay for rate limiting
-Crawl-delay: 10
-
-# Sitemap location
 Sitemap: https://yourdomain.com/sitemap.xml
 
 # Additional rules for specific bots

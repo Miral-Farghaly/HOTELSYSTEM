@@ -6,6 +6,22 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @OA\Schema(
+ *     schema="StaffSkill",
+ *     required={"user_id", "skill_name", "level"},
+ *     @OA\Property(property="id", type="integer", format="int64", readOnly=true),
+ *     @OA\Property(property="user_id", type="integer", format="int64"),
+ *     @OA\Property(property="skill_name", type="string", maxLength=255),
+ *     @OA\Property(property="level", type="string", enum={"beginner", "intermediate", "advanced", "expert"}),
+ *     @OA\Property(property="description", type="string", nullable=true),
+ *     @OA\Property(property="certifications", type="array", @OA\Items(type="string"), nullable=true),
+ *     @OA\Property(property="acquired_date", type="string", format="date", nullable=true),
+ *     @OA\Property(property="expiry_date", type="string", format="date", nullable=true),
+ *     @OA\Property(property="created_at", type="string", format="date-time", readOnly=true),
+ *     @OA\Property(property="updated_at", type="string", format="date-time", readOnly=true)
+ * )
+ */
 class StaffSkill extends Model
 {
     protected $fillable = [

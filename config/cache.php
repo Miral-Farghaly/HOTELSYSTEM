@@ -110,9 +110,9 @@ return [
 
     // Custom cache configuration for hotel system
     'ttl' => [
-        'room_availability' => env('CACHE_ROOM_AVAILABILITY_TTL', 300), // 5 minutes
-        'price_calculation' => env('CACHE_PRICE_CALCULATION_TTL', 3600), // 1 hour
-        'common_queries' => env('CACHE_COMMON_QUERIES_TTL', 1800), // 30 minutes
+        'room_availability' => 300, // 5 minutes
+        'price_calculations' => 3600, // 1 hour
+        'common_queries' => 1800, // 30 minutes
         'user_preferences' => env('CACHE_USER_PREFERENCES_TTL', 86400), // 24 hours
         'hotel_settings' => env('CACHE_HOTEL_SETTINGS_TTL', 86400), // 24 hours
     ],

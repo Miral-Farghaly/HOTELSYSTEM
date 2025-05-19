@@ -7,7 +7,7 @@ return [
          * The name of this application. You can use this name to monitor
          * the backups.
          */
-        'name' => env('APP_NAME', 'Hotel-System-Backup'),
+        'name' => env('APP_NAME', 'laravel-backup'),
 
         'source' => [
             'files' => [
@@ -144,7 +144,7 @@ return [
             /*
              * The filename prefix used for the backup zip file.
              */
-            'filename_prefix' => '',
+            'filename_prefix' => 'backup-',
 
             /*
              * The disk names on which the backups will be stored.
@@ -197,12 +197,12 @@ return [
      */
     'notifications' => [
         'notifications' => [
-            \Spatie\Backup\Notifications\Notifications\BackupHasFailedNotification::class => ['mail'],
-            \Spatie\Backup\Notifications\Notifications\UnhealthyBackupWasFoundNotification::class => ['mail'],
-            \Spatie\Backup\Notifications\Notifications\CleanupHasFailedNotification::class => ['mail'],
-            \Spatie\Backup\Notifications\Notifications\BackupWasSuccessfulNotification::class => ['mail'],
-            \Spatie\Backup\Notifications\Notifications\HealthyBackupWasFoundNotification::class => ['mail'],
-            \Spatie\Backup\Notifications\Notifications\CleanupWasSuccessfulNotification::class => ['mail'],
+            \Spatie\Backup\Notifications\Notifications\BackupHasFailed::class => ['mail'],
+            \Spatie\Backup\Notifications\Notifications\UnhealthyBackupWasFound::class => ['mail'],
+            \Spatie\Backup\Notifications\Notifications\CleanupHasFailed::class => ['mail'],
+            \Spatie\Backup\Notifications\Notifications\BackupWasSuccessful::class => ['mail'],
+            \Spatie\Backup\Notifications\Notifications\HealthyBackupWasFound::class => ['mail'],
+            \Spatie\Backup\Notifications\Notifications\CleanupWasSuccessful::class => ['mail'],
         ],
 
         /*
@@ -212,7 +212,7 @@ return [
         'notifiable' => \Spatie\Backup\Notifications\Notifiable::class,
 
         'mail' => [
-            'to' => env('BACKUP_NOTIFICATION_EMAIL', 'your@email.com'),
+            'to' => 'your@email.com',
 
             'from' => [
                 'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
@@ -255,7 +255,7 @@ return [
      */
     'monitor_backups' => [
         [
-            'name' => env('APP_NAME', 'Hotel-System-Backup'),
+            'name' => env('APP_NAME', 'laravel-backup'),
             'disks' => ['local'],
             'health_checks' => [
                 \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumAgeInDays::class => 1,
@@ -295,9 +295,9 @@ return [
              * Yearly backups for the last 2 years
              */
             'keep_all_backups_for_days' => 7,
-            'keep_daily_backups_for_days' => 7,
-            'keep_weekly_backups_for_weeks' => 4,
-            'keep_monthly_backups_for_months' => 6,
+            'keep_daily_backups_for_days' => 16,
+            'keep_weekly_backups_for_weeks' => 8,
+            'keep_monthly_backups_for_months' => 4,
             'keep_yearly_backups_for_years' => 2,
             'delete_oldest_backups_when_using_more_megabytes_than' => 5000,
         ],

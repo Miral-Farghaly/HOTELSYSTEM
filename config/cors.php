@@ -15,41 +15,30 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'paths' => ['api/*'],
 
-    'allowed_methods' => [
-        'GET',
-        'POST',
-        'PUT',
-        'PATCH',
-        'DELETE',
-        'OPTIONS'
-    ],
+    'allowed_methods' => ['*'],
 
-    'allowed_origins' => [
-        env('FRONTEND_URL', 'http://localhost:3000')
-    ],
+    'allowed_origins' => [env('FRONTEND_URL', 'http://localhost:3000')],
 
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => [
-        'Content-Type',
-        'X-Requested-With',
-        'Authorization',
-        'X-XSRF-TOKEN',
-    ],
+    'allowed_headers' => ['*'],
 
-    'exposed_headers' => [
-        'Cache-Control',
-        'Content-Language',
-        'Content-Type',
-        'Expires',
-        'Last-Modified',
-        'Pragma',
-    ],
+    'exposed_headers' => ['Content-Disposition'],
 
-    'max_age' => 60 * 60 * 24, // 24 hours
+    'max_age' => 0,
 
     'supports_credentials' => true,
+
+    // Additional security headers
+    'security_headers' => [
+        'X-Frame-Options' => 'SAMEORIGIN',
+        'X-XSS-Protection' => '1; mode=block',
+        'X-Content-Type-Options' => 'nosniff',
+        'Referrer-Policy' => 'strict-origin-when-cross-origin',
+        'Content-Security-Policy' => "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';",
+        'Permissions-Policy' => 'camera=(), microphone=(), geolocation=()'
+    ]
 
 ];

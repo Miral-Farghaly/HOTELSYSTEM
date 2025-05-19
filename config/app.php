@@ -100,10 +100,15 @@ return [
 
     'available_locales' => [
         'en' => 'English',
-        'es' => 'Español',
-        'fr' => 'Français',
         'ar' => 'العربية',
+        'fr' => 'Français',
+        'es' => 'Español',
+        'de' => 'Deutsch',
+        'it' => 'Italiano',
+        'pt' => 'Português',
+        'ru' => 'Русский',
         'zh' => '中文',
+        'ja' => '日本語',
     ],
 
     /*
@@ -167,13 +172,17 @@ return [
         /*
          * Package Service Providers...
          */
+        Spatie\Backup\BackupServiceProvider::class,
+        Spatie\Permission\PermissionServiceProvider::class,
+        Spatie\Sitemap\SitemapServiceProvider::class,
+        L5Swagger\L5SwaggerServiceProvider::class,
 
         /*
          * Application Service Providers...
          */
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
-        // App\Providers\BroadcastServiceProvider::class,
+        App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
     ])->toArray(),

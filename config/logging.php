@@ -54,8 +54,15 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['daily'],
+            'channels' => ['daily', 'sentry'],
             'ignore_exceptions' => false,
+        ],
+
+        'single' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/laravel.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
         ],
 
         'daily' => [
@@ -63,21 +70,59 @@ return [
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 14,
-            'permission' => 0664,
+            'replace_placeholders' => true,
+        ],
+
+        'slack' => [
+            'driver' => 'slack',
+            'url' => env('LOG_SLACK_WEBHOOK_URL'),
+            'username' => 'Hotel System Log',
+            'emoji' => ':boom:',
+            'level' => env('LOG_LEVEL', 'critical'),
+            'replace_placeholders' => true,
+        ],
+
+        'papertrail' => [
+            'driver' => 'monolog',
+            'level' => env('LOG_LEVEL', 'debug'),
+            'handler' => env('LOG_PAPERTRAIL_HANDLER', SyslogUdpHandler::class),
+            'handler_with' => [
+                'host' => env('PAPERTRAIL_URL'),
+                'port' => env('PAPERTRAIL_PORT'),
+                'connectionString' => 'tls://'.env('PAPERTRAIL_URL').':'.env('PAPERTRAIL_PORT'),
+            ],
+            'processors' => [PsrLogMessageProcessor::class],
+        ],
+
+        'sentry' => [
+            'driver' => 'sentry',
+            'level' => env('LOG_LEVEL', 'error'),
+            'bubble' => true,
+        ],
+
+        'emergency' => [
+            'path' => storage_path('logs/laravel.log'),
         ],
 
         'booking' => [
             'driver' => 'daily',
             'path' => storage_path('logs/booking.log'),
-            'level' => 'debug',
+            'level' => 'info',
             'days' => 30,
         ],
 
         'payment' => [
             'driver' => 'daily',
             'path' => storage_path('logs/payment.log'),
-            'level' => 'debug',
+            'level' => 'info',
             'days' => 90,
+        ],
+
+        'maintenance' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/maintenance.log'),
+            'level' => 'info',
+            'days' => 30,
         ],
 
         'error' => [
@@ -124,10 +169,6 @@ return [
         'null' => [
             'driver' => 'monolog',
             'handler' => NullHandler::class,
-        ],
-
-        'emergency' => [
-            'path' => storage_path('logs/laravel.log'),
         ],
     ],
 

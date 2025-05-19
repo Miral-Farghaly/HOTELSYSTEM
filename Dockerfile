@@ -1,54 +1,52 @@
-FROM php:8.1-fpm
+# Use PHP 8.2 FPM Alpine as base image
+FROM php:8.2-fpm-alpine
+
+# Install system dependencies
+RUN apk add --no-cache \
+    linux-headers \
+    bash \
+    git \
+    curl \
+    libpng-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    nodejs \
+    npm \
+    libzip-dev \
+    autoconf \
+    gcc \
+    g++ \
+    make
+
+# Install PHP extensions
+RUN docker-php-ext-install pdo pdo_mysql bcmath gd soap zip
+RUN pecl install redis && docker-php-ext-enable redis
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Set working directory
 WORKDIR /var/www/html
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    zip \
-    unzip \
-    supervisor \
-    nodejs \
-    npm \
-    libzip-dev \
-    redis-tools \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \
-    && pecl install redis \
-    && docker-php-ext-enable redis
-
-# Install Node.js and npm
-RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs \
-    && npm install -g npm@latest
-
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Install PHP Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Copy existing application directory
+# Copy project files
 COPY . .
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
+# Set git safe directory
+RUN git config --global --add safe.directory /var/www/html
 
-# Install dependencies
+# Install PHP dependencies
 RUN composer install --no-interaction --optimize-autoloader --no-dev
-RUN npm install && npm run build
 
-# Configure supervisor
-COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+# Install Node.js dependencies and build frontend
+RUN npm install
+RUN npm run build
 
-# Expose port 9000
+# Change ownership of the storage directory
+RUN chown -R www-data:www-data storage bootstrap/cache
+
+# Expose port 9000 for PHP-FPM
 EXPOSE 9000
 
-# Start supervisor
-CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"] 
+# Start PHP-FPM
+CMD ["php-fpm"] 

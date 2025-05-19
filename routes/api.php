@@ -27,10 +27,10 @@ Route::prefix('v1')->name('api.')->group(function () {
     Route::post('auth/reset-password', [AuthController::class, 'resetPassword']);
     
     // Room routes (public)
-    Route::get('rooms/available', [RoomController::class, 'available']);
-    Route::get('rooms/check-availability', [RoomController::class, 'checkAvailability']);
     Route::get('rooms', [RoomController::class, 'index']);
+    Route::get('rooms/available', [RoomController::class, 'available']);
     Route::get('rooms/{room}', [RoomController::class, 'show']);
+    Route::get('rooms/{room}/availability', [RoomController::class, 'checkAvailability']);
     
     // Payment webhook
     Route::post('payments/webhook', [PaymentController::class, 'handleWebhook']);
@@ -45,8 +45,18 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::post('auth/logout', [AuthController::class, 'logout']);
     Route::get('auth/profile', [AuthController::class, 'profile']);
     
+    // Room management routes
+    Route::middleware('permission:manage-rooms')->group(function () {
+        Route::post('rooms', [RoomController::class, 'store']);
+        Route::put('rooms/{room}', [RoomController::class, 'update']);
+        Route::delete('rooms/{room}', [RoomController::class, 'destroy']);
+        Route::post('rooms/{room}/maintenance', [RoomController::class, 'maintenance']);
+    });
+
     // Booking routes
-    Route::apiResource('bookings', BookingController::class);
+    Route::get('bookings', [BookingController::class, 'index']);
+    Route::post('bookings', [BookingController::class, 'store']);
+    Route::get('bookings/{booking}', [BookingController::class, 'show']);
     Route::put('bookings/{booking}/cancel', [BookingController::class, 'cancel']);
     
     // Payment routes
@@ -76,14 +86,6 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
         Route::get('reports/occupancy', [ReportController::class, 'occupancy']);
         Route::get('reports/revenue', [ReportController::class, 'revenue']);
         Route::get('reports/maintenance', [ReportController::class, 'maintenance']);
-    });
-
-    // Rooms management (requires permission)
-    Route::middleware('permission:manage-rooms')->group(function () {
-        Route::post('rooms', [RoomController::class, 'store']);
-        Route::put('rooms/{room}', [RoomController::class, 'update']);
-        Route::delete('rooms/{room}', [RoomController::class, 'destroy']);
-        Route::put('rooms/{room}/maintenance', [RoomController::class, 'maintenance']);
     });
 
     // Room reservations
@@ -117,4 +119,9 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     // Staff Skills
     Route::apiResource('staff/skills', 'App\Http\Controllers\Api\V1\StaffSkillController');
     Route::post('staff/skills/{skill}/verify', 'App\Http\Controllers\Api\V1\StaffSkillController@verify');
+
+    // Payment routes
+    Route::post('/payments', [PaymentController::class, 'processPayment']);
+    Route::get('/payments/{transactionId}', [PaymentController::class, 'getStatus']);
+    Route::post('/payments/{transactionId}/refund', [PaymentController::class, 'refund']);
 }); 

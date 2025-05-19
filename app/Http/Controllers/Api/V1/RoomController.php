@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Resources\RoomResource;
 use App\Http\Requests\RoomRequest;
+use Illuminate\Support\Facades\Validator;
 
 /**
  * @OA\Tag(
@@ -84,6 +85,20 @@ class RoomController extends Controller
      */
     public function store(RoomRequest $request): JsonResponse
     {
+        $validator = Validator::make($request->all(), [
+            'type' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'description' => 'required|string',
+            'available' => 'boolean'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
         $room = $this->roomService->createRoom($request->validated());
         return response()->json(new RoomResource($room), 201);
     }
@@ -113,7 +128,10 @@ class RoomController extends Controller
      */
     public function show(Room $room): JsonResponse
     {
-        return response()->json(new RoomResource($room));
+        return response()->json([
+            'status' => 'success',
+            'data' => new RoomResource($room)
+        ]);
     }
 
     /**
@@ -145,6 +163,20 @@ class RoomController extends Controller
      */
     public function update(RoomRequest $request, Room $room): JsonResponse
     {
+        $validator = Validator::make($request->all(), [
+            'type' => 'string|max:255',
+            'price' => 'numeric|min:0',
+            'description' => 'string',
+            'available' => 'boolean'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
         $room = $this->roomService->updateRoom($room, $request->validated());
         return response()->json(new RoomResource($room));
     }
@@ -174,7 +206,10 @@ class RoomController extends Controller
     public function destroy(Room $room): JsonResponse
     {
         $this->roomService->deleteRoom($room);
-        return response()->json(null, 204);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Room deleted successfully'
+        ]);
     }
 
     /**
@@ -211,6 +246,18 @@ class RoomController extends Controller
      */
     public function checkAvailability(Request $request): JsonResponse
     {
+        $validator = Validator::make($request->all(), [
+            'check_in' => 'required|date|after:today',
+            'check_out' => 'required|date|after:check_in'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
         $availability = $this->roomService->checkAvailability(
             $request->input('check_in'),
             $request->input('check_out'),

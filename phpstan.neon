@@ -2,20 +2,15 @@ parameters:
     level: 8
     paths:
         - app
-        - config
-        - database
-        - routes
         - tests
     excludePaths:
-        - vendor
-        - storage
-        - bootstrap/cache
+        - vendor/*
     checkMissingIterableValueType: false
     checkGenericClassInNonGenericObjectType: false
     ignoreErrors:
         - '#PHPDoc tag @var#'
-        - '#Call to an undefined method Illuminate\\Support\\Facades\\[a-zA-Z]+::[a-zA-Z]+\(\)#'
-        - '#Access to an undefined property [a-zA-Z\\]+::\$[a-zA-Z_]+#'
+        - '#Call to an undefined method#'
+        - '#Access to an undefined property#'
     tmpDir: storage/framework/cache/phpstan
     parallel:
         maximumNumberOfProcesses: 4

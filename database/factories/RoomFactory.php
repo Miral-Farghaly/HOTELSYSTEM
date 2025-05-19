@@ -3,64 +3,61 @@
 namespace Database\Factories;
 
 use App\Models\Room;
-use App\Models\RoomType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class RoomFactory extends Factory
 {
     protected $model = Room::class;
 
-    public function definition(): array
+    public function definition()
     {
+        $price = $this->faker->randomFloat(2, 100, 1000);
         return [
             'number' => $this->faker->unique()->numberBetween(100, 999),
-            'room_type_id' => RoomType::factory(),
+            'type' => $this->faker->randomElement(['standard', 'deluxe', 'suite', 'presidential']),
             'floor' => $this->faker->numberBetween(1, 10),
-            'status' => $this->faker->randomElement(['active', 'inactive', 'maintenance']),
             'description' => $this->faker->paragraph(),
-            'amenities' => $this->faker->randomElements([
-                'wifi',
-                'tv',
-                'minibar',
-                'safe',
-                'air_conditioning',
-                'desk',
-                'bathtub',
-                'shower',
-                'hairdryer',
-                'iron'
-            ], $this->faker->numberBetween(3, 6)),
-            'is_maintenance' => $this->faker->boolean(10),
+            'price_per_night' => $price,
+            'base_price' => $price,
+            'currency' => 'USD',
+            'capacity' => $this->faker->numberBetween(1, 6),
+            'is_available' => $this->faker->boolean(80),
+            'needs_maintenance' => $this->faker->boolean(10),
+            'amenities' => $this->faker->randomElements(
+                ['wifi', 'tv', 'minibar', 'safe', 'balcony', 'ocean_view', 'bathtub', 'kitchen'],
+                $this->faker->numberBetween(3, 6)
+            ),
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 
-    public function active(): self
+    public function available()
     {
         return $this->state(function (array $attributes) {
             return [
-                'status' => 'active',
-                'is_maintenance' => false,
+                'is_available' => true,
+                'needs_maintenance' => false,
             ];
         });
     }
 
-    public function maintenance(): self
+    public function unavailable()
     {
         return $this->state(function (array $attributes) {
             return [
-                'status' => 'maintenance',
-                'is_maintenance' => true,
+                'is_available' => false,
             ];
         });
     }
 
-    public function inactive(): self
+    public function needsMaintenance()
     {
         return $this->state(function (array $attributes) {
             return [
-                'status' => 'inactive',
-                'is_maintenance' => false,
+                'is_available' => false,
+                'needs_maintenance' => true,
             ];
         });
     }
-} 
+}

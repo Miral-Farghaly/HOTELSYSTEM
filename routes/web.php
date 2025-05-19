@@ -15,9 +15,9 @@ use App\Http\Controllers\UserController;
 */
 
 // Serve React app for all non-API routes
-Route::get('/{path?}', function () {
+Route::get('/{any}', function () {
     return view('app');
-})->where('path', '^(?!api).*$');
+})->where('any', '^(?!api).*$');
 
 // API Routes
 Route::prefix('api')->group(function () {
