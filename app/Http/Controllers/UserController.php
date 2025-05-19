@@ -31,7 +31,11 @@ class UserController extends Controller
         }
         else 
              return response()->json([
-            'success' => false,]);
+            
+            'success' => false,
+            'message' => 'Invalid credentials'
+         
+        ]);
     }
 
     public function register(Request $request){

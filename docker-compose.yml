@@ -64,8 +64,10 @@ services:
     container_name: hotel-db
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: hotel_db
+      MYSQL_USER: hoteluser
+      MYSQL_PASSWORD: hotelpass
+      MYSQL_ROOT_PASSWORD: hotelpass
     volumes:
       - dbdata:/var/lib/mysql
       - ./docker/mysql/my.cnf:/etc/mysql/my.cnf:delegated
