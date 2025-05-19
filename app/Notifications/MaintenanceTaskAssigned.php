@@ -2,49 +2,45 @@
 
 namespace App\Notifications;
 
-use App\Models\MaintenanceTask;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Messages\MailMessage;
+use App\Models\MaintenanceTask;
 
-class MaintenanceTaskAssigned extends Notification implements ShouldQueue
+class MaintenanceTaskAssigned extends Notification
 {
     use Queueable;
 
-    protected MaintenanceTask $task;
+    public $task;
 
     public function __construct(MaintenanceTask $task)
     {
         $this->task = $task;
     }
 
-    public function via($notifiable): array
+    public function via($notifiable)
     {
         return ['mail', 'database'];
     }
 
-    public function toMail($notifiable): MailMessage
+    public function toMail($notifiable)
     {
         return (new MailMessage)
             ->subject('New Maintenance Task Assigned')
             ->line('You have been assigned a new maintenance task.')
-            ->line("Room: {$this->task->room->number}")
-            ->line("Category: {$this->task->category->name}")
-            ->line("Scheduled Date: {$this->task->scheduled_date->format('Y-m-d H:i')}")
-            ->line("Priority Level: {$this->task->category->priority_level}")
-            ->action('View Task Details', url("/maintenance/tasks/{$this->task->id}"))
-            ->line('Please review the task details and ensure you have all required skills and materials.');
+            ->line('Task: ' . $this->task->description)
+            ->line('Room: ' . $this->task->room->number)
+            ->line('Due Date: ' . $this->task->scheduled_date)
+            ->action('View Task', url('/maintenance/tasks/' . $this->task->id));
     }
 
-    public function toArray($notifiable): array
+    public function toArray($notifiable)
     {
         return [
             'task_id' => $this->task->id,
+            'description' => $this->task->description,
             'room_number' => $this->task->room->number,
-            'category_name' => $this->task->category->name,
-            'scheduled_date' => $this->task->scheduled_date->format('Y-m-d H:i'),
-            'priority_level' => $this->task->category->priority_level,
+            'scheduled_date' => $this->task->scheduled_date,
         ];
     }
 } 

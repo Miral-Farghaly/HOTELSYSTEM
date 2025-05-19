@@ -23,34 +23,15 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-        // Create roles
-        $adminRole = Role::create(['name' => 'admin']);
-        $customerRole = Role::create(['name' => 'customer']);
-        $receptionistRole = Role::create(['name' => 'receptionist']);
-
-        // Create permissions
-        $permissions = [
-            'manage-rooms',
-            'manage-bookings',
-            'manage-users',
-            'manage-payments',
-            'view-reports',
-            'manage-maintenance',
-            'manage-staff'
-        ];
-
-        foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
-        }
-
-        // Assign permissions to roles
-        $adminRole->givePermissionTo($permissions);
-        $receptionistRole->givePermissionTo([
-            'manage-bookings',
-            'manage-maintenance',
-            'view-reports'
-        ]);
-
+        // Seed roles and permissions
+        $this->call(RolesAndPermissionsSeeder::class);
+        
+        // Seed room types
+        $this->call(RoomTypeSeeder::class);
+        
+        // Seed configurations
+        $this->call(ConfigurationSeeder::class);
+        
         // Create admin user
         $admin = User::factory()->create([
             'name' => 'Admin User',
@@ -59,49 +40,59 @@ class DatabaseSeeder extends Seeder
         ]);
         $admin->assignRole('admin');
 
-        // Create receptionist
-        $receptionist = User::factory()->create([
-            'name' => 'Receptionist User',
-            'email' => 'receptionist@hotel.com',
+        // Create staff user
+        $staff = User::factory()->create([
+            'name' => 'Staff User',
+            'email' => 'staff@hotel.com',
             'password' => bcrypt('password')
         ]);
-        $receptionist->assignRole('receptionist');
+        $staff->assignRole('staff');
 
-        // Create room types
-        $roomTypes = [
-            'standard' => [
-                'base_price' => 100.00,
-                'capacity' => 2,
-                'amenities' => ['wifi', 'tv', 'air_conditioning']
-            ],
-            'deluxe' => [
-                'base_price' => 200.00,
-                'capacity' => 3,
-                'amenities' => ['wifi', 'tv', 'air_conditioning', 'minibar', 'safe']
-            ],
-            'suite' => [
-                'base_price' => 350.00,
-                'capacity' => 4,
-                'amenities' => ['wifi', 'tv', 'air_conditioning', 'minibar', 'safe', 'kitchen', 'balcony']
-            ]
-        ];
-
-        // Create sample rooms
-        foreach ($roomTypes as $type => $details) {
-            for ($i = 1; $i <= 5; $i++) {
+        // Create sample rooms for each room type
+        $roomTypes = ['Standard Single', 'Standard Double', 'Deluxe Suite', 'Family Room', 'Presidential Suite'];
+        $floors = [1, 1, 2, 2, 3];
+        
+        foreach ($roomTypes as $index => $type) {
+            $floor = $floors[$index];
+            for ($i = 1; $i <= 3; $i++) {
+                $roomNumber = ($floor * 100) + ($index * 10) + $i;
                 Room::create([
-                    'number' => $type[0] . str_pad($i, 2, '0', STR_PAD_LEFT),
+                    'number' => $roomNumber,
                     'type' => $type,
-                    'floor' => ceil($i/2),
-                    'description' => ucfirst($type) . ' room with modern amenities',
-                    'price_per_night' => $details['base_price'],
-                    'base_price' => $details['base_price'],
-                    'capacity' => $details['capacity'],
-                    'amenities' => $details['amenities'],
+                    'floor' => $floor,
+                    'description' => "Modern $type room with excellent amenities",
+                    'price_per_night' => $this->getPriceForType($type),
+                    'base_price' => $this->getPriceForType($type),
+                    'currency' => 'USD',
+                    'capacity' => $this->getCapacityForType($type),
                     'is_available' => true,
                     'needs_maintenance' => false
                 ]);
             }
         }
+    }
+
+    private function getPriceForType(string $type): float
+    {
+        return match($type) {
+            'Standard Single' => 100.00,
+            'Standard Double' => 150.00,
+            'Deluxe Suite' => 300.00,
+            'Family Room' => 250.00,
+            'Presidential Suite' => 500.00,
+            default => 100.00,
+        };
+    }
+
+    private function getCapacityForType(string $type): int
+    {
+        return match($type) {
+            'Standard Single' => 1,
+            'Standard Double' => 2,
+            'Deluxe Suite' => 3,
+            'Family Room' => 4,
+            'Presidential Suite' => 4,
+            default => 2,
+        };
     }
 }

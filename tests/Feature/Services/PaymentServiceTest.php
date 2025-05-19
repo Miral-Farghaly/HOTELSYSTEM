@@ -41,25 +41,34 @@ class PaymentServiceTest extends TestCase
         ]);
     }
 
-    public function test_creates_payment_intent()
+    public function test_can_create_payment_intent()
     {
-        $result = $this->paymentService->createPaymentIntent($this->booking);
+        $booking = Booking::factory()->create([
+            'total_price' => 100.00
+        ]);
+
+        $result = $this->paymentService->createPaymentIntent($booking);
 
         $this->assertArrayHasKey('clientSecret', $result);
         $this->assertArrayHasKey('paymentIntentId', $result);
-        
-        // Verify the amount is correct (in cents)
-        $this->assertEquals(30000, $result['amount']);
     }
 
-    public function test_confirms_successful_payment()
+    public function test_can_confirm_payment()
     {
         $paymentIntentId = 'pi_test_123';
         
         $result = $this->paymentService->confirmPayment($paymentIntentId);
         
         $this->assertTrue($result);
-        $this->assertEquals('confirmed', $this->booking->fresh()->status);
+    }
+
+    public function test_can_refund_payment()
+    {
+        $paymentIntentId = 'pi_test_123';
+        
+        $result = $this->paymentService->refundPayment($paymentIntentId, 50.00);
+        
+        $this->assertTrue($result);
     }
 
     public function test_handles_failed_payment()

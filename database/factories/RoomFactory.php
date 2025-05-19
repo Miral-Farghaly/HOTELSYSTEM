@@ -12,9 +12,11 @@ class RoomFactory extends Factory
     public function definition()
     {
         $price = $this->faker->randomFloat(2, 100, 1000);
+        $roomTypes = ['Standard Single', 'Standard Double', 'Deluxe Suite', 'Family Room', 'Presidential Suite'];
+        
         return [
             'number' => $this->faker->unique()->numberBetween(100, 999),
-            'type' => $this->faker->randomElement(['standard', 'deluxe', 'suite', 'presidential']),
+            'type' => $this->faker->randomElement($roomTypes),
             'floor' => $this->faker->numberBetween(1, 10),
             'description' => $this->faker->paragraph(),
             'price_per_night' => $price,
@@ -23,12 +25,17 @@ class RoomFactory extends Factory
             'capacity' => $this->faker->numberBetween(1, 6),
             'is_available' => $this->faker->boolean(80),
             'needs_maintenance' => $this->faker->boolean(10),
+            'is_maintenance' => false,
+            'status' => 'active',
+            'is_blocked' => false,
+            'block_reason' => null,
+            'block_until' => null,
+            'allow_waitlist' => $this->faker->boolean(20),
+            'max_overbooking' => $this->faker->numberBetween(0, 2),
             'amenities' => $this->faker->randomElements(
                 ['wifi', 'tv', 'minibar', 'safe', 'balcony', 'ocean_view', 'bathtub', 'kitchen'],
                 $this->faker->numberBetween(3, 6)
             ),
-            'created_at' => now(),
-            'updated_at' => now(),
         ];
     }
 
@@ -38,6 +45,9 @@ class RoomFactory extends Factory
             return [
                 'is_available' => true,
                 'needs_maintenance' => false,
+                'is_maintenance' => false,
+                'status' => 'active',
+                'is_blocked' => false,
             ];
         });
     }
@@ -47,6 +57,7 @@ class RoomFactory extends Factory
         return $this->state(function (array $attributes) {
             return [
                 'is_available' => false,
+                'status' => 'inactive',
             ];
         });
     }
@@ -57,6 +68,8 @@ class RoomFactory extends Factory
             return [
                 'is_available' => false,
                 'needs_maintenance' => true,
+                'is_maintenance' => true,
+                'status' => 'maintenance',
             ];
         });
     }

@@ -1,112 +1,96 @@
 version: '3.8'
 
 services:
-  # Laravel Application
+  # PHP Service
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: hotel_laravel
+    container_name: hotel-app
     restart: unless-stopped
     working_dir: /var/www/html
+    env_file:
+      - .env
+    environment:
+      - APP_ENV=local
+      - CONTAINER_ROLE=app
     volumes:
-      - ./:/var/www/html
+      - ./:/var/www/html:delegated
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini:delegated
     networks:
-      - hotel_network
+      - hotel-network
     depends_on:
-      - mysql
+      - db
       - redis
 
-  # Crow API Gateway
-  crow:
-    build:
-      context: ./Crow
-      dockerfile: Dockerfile.crow
-    container_name: hotel_crow
-    restart: unless-stopped
-    environment:
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_DATABASE: hotel_db
-      DB_USERNAME: hotel_user
-      DB_PASSWORD: hotel_password
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      APP_URL: http://app:9000
-      CROW_PORT: 18080
-      CROW_HOST: 0.0.0.0
-      LARAVEL_API_URL: http://app:9000
-      CROW_SSL_CERT: /etc/nginx/ssl/server.crt
-      CROW_SSL_KEY: /etc/nginx/ssl/server.key
-    volumes:
-      - ./docker/nginx/ssl/:/etc/nginx/ssl/
-    networks:
-      - hotel_network
-    depends_on:
-      - app
-
-  # Nginx Web Server
-  nginx:
-    image: nginx:alpine
-    container_name: hotel_nginx
-    restart: unless-stopped
-    ports:
-      - "8080:80"
-      - "8443:443"
-    volumes:
-      - ./:/var/www/html
-      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
-      - ./docker/nginx/ssl/:/etc/nginx/ssl/
-    networks:
-      - hotel_network
-    depends_on:
-      - app
-      - crow
-
-  # MySQL Database
-  mysql:
-    image: mysql:8.0
-    container_name: hotel_mysql
-    restart: unless-stopped
-    environment:
-      MYSQL_DATABASE: hotel_db
-      MYSQL_ROOT_PASSWORD: hotel_password
-      MYSQL_PASSWORD: hotel_password
-      MYSQL_USER: hotel_user
-    volumes:
-      - mysql_data:/var/lib/mysql
-    networks:
-      - hotel_network
-
-  # Redis for Caching
-  redis:
-    image: redis:alpine
-    container_name: hotel_redis
-    restart: unless-stopped
-    networks:
-      - hotel_network
-
-  # Queue Worker
-  queue:
+  # Vite Development Server
+  vite:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: hotel_queue
-    restart: unless-stopped
-    command: php artisan queue:work
+    container_name: hotel-vite
+    command: sh -c "npm install && npm run dev"
+    working_dir: /var/www/html
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=development
+    ports:
+      - "5173:5173"
     volumes:
-      - ./:/var/www/html
+      - ./:/var/www/html:delegated
+      - /var/www/html/node_modules
     networks:
-      - hotel_network
+      - hotel-network
+
+  # Nginx Service
+  webserver:
+    image: nginx:alpine
+    container_name: hotel-webserver
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html:delegated
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/:delegated
     depends_on:
       - app
-      - mysql
-      - redis
+      - vite
+    networks:
+      - hotel-network
+
+  # MySQL Service
+  db:
+    image: mysql:8.0
+    container_name: hotel-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - dbdata:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/my.cnf:delegated
+    ports:
+      - "3306:3306"
+    networks:
+      - hotel-network
+
+  # Redis Service
+  redis:
+    image: redis:alpine
+    container_name: hotel-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - hotel-network
 
 networks:
-  hotel_network:
+  hotel-network:
     driver: bridge
 
 volumes:
-  mysql_data:
+  dbdata:
     driver: local 

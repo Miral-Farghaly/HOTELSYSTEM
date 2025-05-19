@@ -11,6 +11,10 @@ use App\Http\Controllers\Api\V1\Admin\MonitoringController;
 use App\Http\Controllers\Api\V1\ReservationController;
 use App\Http\Controllers\Api\V1\Admin\ReportController;
 use App\Http\Controllers\Api\V1\ProfileController;
+use App\Http\Controllers\Api\Admin\UserController;
+use App\Http\Controllers\Api\Admin\RoomController as AdminRoomController;
+use App\Http\Controllers\Api\Admin\BookingController as AdminBookingController;
+use App\Http\Controllers\Api\Admin\StatisticsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -124,4 +128,23 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::post('/payments', [PaymentController::class, 'processPayment']);
     Route::get('/payments/{transactionId}', [PaymentController::class, 'getStatus']);
     Route::post('/payments/{transactionId}/refund', [PaymentController::class, 'refund']);
+});
+
+// Admin routes
+Route::prefix('v1/admin')->middleware(['auth:sanctum', 'role:admin'])->group(function () {
+    // User management
+    Route::get('/users', [UserController::class, 'index']);
+    Route::post('/users/{user}/roles', [UserController::class, 'assignRole']);
+
+    // Room management
+    Route::get('/rooms', [AdminRoomController::class, 'index']);
+    Route::post('/rooms', [AdminRoomController::class, 'store']);
+    Route::put('/rooms/{room}', [AdminRoomController::class, 'update']);
+    Route::post('/rooms/{room}/maintenance', [AdminRoomController::class, 'toggleMaintenance']);
+
+    // Booking management
+    Route::get('/bookings', [AdminBookingController::class, 'index']);
+
+    // Statistics
+    Route::get('/statistics/bookings', [StatisticsController::class, 'bookings']);
 }); 

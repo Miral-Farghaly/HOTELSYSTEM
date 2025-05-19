@@ -11,16 +11,15 @@ class SecurityHeaders
     {
         $response = $next($request);
 
-        $response->headers->set('Content-Security-Policy', 
-            "default-src 'self' localhost:8889; " .
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' localhost:8889; " .
-            "style-src 'self' 'unsafe-inline' fonts.googleapis.com localhost:8889; " .
-            "font-src 'self' fonts.gstatic.com data:; " .
-            "img-src 'self' data: https: blob:; " .
-            "connect-src 'self' localhost:8889 ws://localhost:8889 wss://localhost:8889; " .
-            "frame-src 'self' localhost:8889;"
-        );
+        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
+        $response->headers->set('X-XSS-Protection', '1; mode=block');
+        $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
+        $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
 
+        // Remove any existing CSP headers to avoid conflicts
+        $response->headers->remove('Content-Security-Policy');
+        
         return $response;
     }
 } 

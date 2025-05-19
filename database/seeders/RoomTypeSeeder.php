@@ -15,6 +15,8 @@ class RoomTypeSeeder extends Seeder
                 'description' => 'Comfortable room with a single bed, perfect for solo travelers',
                 'base_price' => 100.00,
                 'capacity' => 1,
+                'bed_size' => 'Single',
+                'view_type' => 'City',
                 'amenities' => json_encode([
                     'Wi-Fi',
                     'TV',
@@ -28,6 +30,8 @@ class RoomTypeSeeder extends Seeder
                 'description' => 'Spacious room with a double bed, ideal for couples',
                 'base_price' => 150.00,
                 'capacity' => 2,
+                'bed_size' => 'Double',
+                'view_type' => 'City',
                 'amenities' => json_encode([
                     'Wi-Fi',
                     'TV',
@@ -42,6 +46,8 @@ class RoomTypeSeeder extends Seeder
                 'description' => 'Luxury suite with separate living area and premium amenities',
                 'base_price' => 300.00,
                 'capacity' => 3,
+                'bed_size' => 'King',
+                'view_type' => 'Ocean',
                 'amenities' => json_encode([
                     'Wi-Fi',
                     'Smart TV',
@@ -59,6 +65,8 @@ class RoomTypeSeeder extends Seeder
                 'description' => 'Spacious room designed for families with multiple beds',
                 'base_price' => 250.00,
                 'capacity' => 4,
+                'bed_size' => 'Two Queens',
+                'view_type' => 'Garden',
                 'amenities' => json_encode([
                     'Wi-Fi',
                     'TV',
@@ -74,6 +82,8 @@ class RoomTypeSeeder extends Seeder
                 'description' => 'Our most luxurious accommodation with premium services and amenities',
                 'base_price' => 500.00,
                 'capacity' => 4,
+                'bed_size' => 'California King',
+                'view_type' => 'Panoramic',
                 'amenities' => json_encode([
                     'Wi-Fi',
                     'Smart Home System',

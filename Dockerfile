@@ -23,6 +23,10 @@ RUN apk add --no-cache \
 RUN docker-php-ext-install pdo pdo_mysql bcmath gd soap zip
 RUN pecl install redis && docker-php-ext-enable redis
 
+# Install Node.js 18
+RUN apk add --no-cache nodejs npm
+RUN npm install -g npm@latest
+
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -32,18 +36,21 @@ WORKDIR /var/www/html
 # Copy project files
 COPY . .
 
-# Set git safe directory
-RUN git config --global --add safe.directory /var/www/html
-
 # Install PHP dependencies
-RUN composer install --no-interaction --optimize-autoloader --no-dev
+RUN composer install --no-interaction
 
-# Install Node.js dependencies and build frontend
+# Install Node.js dependencies
 RUN npm install
-RUN npm run build
 
-# Change ownership of the storage directory
-RUN chown -R www-data:www-data storage bootstrap/cache
+# Set correct permissions
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 /var/www/html/storage \
+    && chmod -R 775 /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/public \
+    && mkdir -p /var/www/html/storage/logs \
+    && touch /var/www/html/storage/logs/laravel.log \
+    && chmod 664 /var/www/html/storage/logs/laravel.log \
+    && chown -R www-data:www-data /var/www/html/storage/logs
 
 # Expose port 9000 for PHP-FPM
 EXPOSE 9000
